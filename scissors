@@ -73,7 +73,7 @@ case "$1" in
     )
     ;;
     "td" | "testdir")
-        cd "${S_TEST_DIR:-$basedir/work/test-server}"
+        cd "${S_TEST_DIR:-$basedir/Paper/work/test-server}"
     ;;
     "u" | "up" | "upstream")
     (
@@ -93,6 +93,7 @@ case "$1" in
     "c" | "clean")
         rm -rf Scissors-API
         rm -rf Scissors-Server
+		rm -rf Paper/work
         rm -rf work
         echo "Cleaned build files"
     ;;

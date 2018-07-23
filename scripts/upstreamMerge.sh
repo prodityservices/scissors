@@ -19,3 +19,4 @@ update Paper
 echo "Updating submodules"
 git submodule update --init --recursive
 # Scissors end
+)
