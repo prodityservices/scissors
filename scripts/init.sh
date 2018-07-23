@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+pushd Paper # Scissors
+
 (
 set -e
 PS1="$"
@@ -39,3 +41,5 @@ $gitcmd add src
 $gitcmd commit -m "CraftBukkit $ $(date)" --author="Auto <auto@mated.null>"
 $gitcmd checkout -f HEAD^
 )
+
+popd # Scissors

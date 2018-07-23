@@ -3,7 +3,7 @@
 (
 PS1="$"
 basedir="$(cd "$1" && pwd -P)"
-workdir="$basedir/work"
+workdir="$basedir/Paper/work"
 gitcmd="git -c commit.gpgsign=false"
 applycmd="$gitcmd am --3way --ignore-whitespace"
 # Windows detection to workaround ARG_MAX limitation
@@ -89,10 +89,20 @@ echo "Importing MC Dev"
 # Apply paper
 cd "$basedir"
 (
-    applyPatch "work/Spigot/Spigot-API" Paper-API HEAD &&
-    applyPatch "work/Spigot/Spigot-Server" Paper-Server HEAD
+    applyPatch "Paper/work/Spigot/Spigot-API" Paper-API HEAD &&
+    applyPatch "Paper/work/Spigot/Spigot-Server" Paper-Server HEAD
 ) || (
     echo "Failed to apply Paper Patches"
+    exit 1
+) || exit 1
+
+# Apply Scissors
+cd "$basedir"
+(
+    applyPatch "Paper/Paper-API" Scissors-API HEAD &&
+    applyPatch "Paper/Paper-Server" Scissors-Server HEAD
+) || (
+    echo "Failed to apply Scissors Patches"
     exit 1
 ) || exit 1
 )

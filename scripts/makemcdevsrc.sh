@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Scissors start
+echo "Unsupported with new submodule paper system"
+exit 1
+# Scissors end
+
 (
 set -e
 PS1="$"

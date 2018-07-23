@@ -32,6 +32,7 @@ work/Paperclip
 work/Spigot
 work/Spigot-Server
 work/Spigot-API
+work/Paper
 work/*.jar
 work/test-server
 
@@ -52,8 +53,8 @@ out/
 # other stuff
 run/
 
-Paper-Server
-Paper-API
+Scissors-Server
+Scissors-API
 Paperclip.jar
 paperclip.jar
 paperclip-*.jar

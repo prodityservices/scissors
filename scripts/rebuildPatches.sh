@@ -3,7 +3,7 @@
 (
 PS1="$"
 basedir="$(cd "$1" && pwd -P)"
-workdir="$basedir/work"
+workdir="$basedir/Paper/work"
 gitcmd="git -c commit.gpgsign=false -c core.safecrlf=false"
 
 echo "Rebuilding patch files from current fork state..."
@@ -58,6 +58,6 @@ function savePatches {
     echo "  Patches saved for $what to $what_name-Patches/"
 }
 
-savePatches "$workdir/Spigot/Spigot-API" "Paper-API"
-savePatches "$workdir/Spigot/Spigot-Server" "Paper-Server"
+savePatches "$basedir/Paper/Paper-API" "Scissors-API"
+savePatches "$basedir/Paper/Paper-Server" "Scissors-Server"
 )

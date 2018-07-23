@@ -13,12 +13,12 @@ ___If applicable___
 ### Plugin list:
 ___All plugins running on the server___
 
-### bukkit.yml, spigot.yml, paper.yml, server.properties
+### bukkit.yml, spigot.yml, paper.yml, scissors.yml, server.properties
 ___Gist/pastebin/hastebin links___
 
 ### Other helpful links
 ___The more information we receive, the quicker and more effective we can be at finding the solution to the
 issue.___
 
-### Paper build number:
+### Scissors build number:
 ___This can be found by running `/version` on your server. `latest` is not a proper version number; we require the output of `/version` so we can properly track down the issue.___

@@ -4,22 +4,18 @@
 set -e
 PS1="$"
 basedir="$(cd "$1" && pwd -P)"
-workdir="$basedir/work"
 gitcmd="git -c commit.gpgsign=false"
 
 function update {
-    cd "$workdir/$1"
+    cd "$basedir/$1"
     $gitcmd fetch && $gitcmd reset --hard origin/master
     cd ../
     $gitcmd add $1
 }
 
-update Bukkit
-update CraftBukkit
-update Spigot
+update Paper
 
-if [[ "$2" = "all" || "$2" = "a" ]] ; then
-	update BuildData
-	update Paperclip
-fi
-)
+# Scissors start
+echo "Updating submodules"
+git submodule update --init --recursive
+# Scissors end

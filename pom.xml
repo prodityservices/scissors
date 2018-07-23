@@ -4,18 +4,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Avoid making changes to this file, it has to be deployed manually -->
-    <groupId>com.destroystokyo.paper</groupId>
-    <artifactId>paper-parent</artifactId>
+    <groupId>io.prodity.scissors</groupId>
+    <artifactId>scissors-parent</artifactId>
     <version>dev-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Paper-Parent</name>
-    <description>Parent project for all Paper modules.</description>
-    <url>https://github.com/PaperMC/Paper</url>
+    <name>Scissors-Parent</name>
+    <description>Parent project for all Scissors modules</description>
+    <url>https://github.com/prodityservices/scissors</url>
 
     <modules>
-        <module>Paper-Server</module>
-        <module>Paper-API</module>
+        <module>Scissors-Server</module>
+        <module>Scissors-API</module>
     </modules>
 
     <build>
@@ -39,16 +39,26 @@
             <id>destroystokyo-repo</id>
             <url>https://destroystokyo.com/repo/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>prodity-snapshots</id>
+            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
+        </repository>
+        <repository>
+            <id>prodity-releases</id>
+            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+        </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>destroystokyo-releases</id>
-            <url>https://destroystokyo.com/repo/repository/maven-releases/</url>
+            <id>prodity-releases</id>
+            <name>Prodity Releases</name>
+            <url>https://nexus.prodity.io/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
-            <id>destroystokyo-snapshots</id>
-            <url>https://destroystokyo.com/repo/repository/maven-snapshots/</url>
+            <id>prodity-snapshots</id>
+            <name>Prodity Snapshots</name>
+            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
