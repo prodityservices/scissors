@@ -1,0 +1,72 @@
+From ce1168e2389d48428cf37e34f2c24816fc2adb0c Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Fri, 27 Jul 2018 10:20:56 -0400
+Subject: [PATCH] scissors pom rebranding and organizing
+
+
+diff --git a/pom.xml b/pom.xml
+index ae5cfd1..d222894 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -3,20 +3,19 @@
+          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+ 
+-    <parent>
+-        <groupId>com.destroystokyo.paper</groupId>
+-        <artifactId>paper-parent</artifactId>
+-        <version>dev-SNAPSHOT</version>
+-    </parent>
+-
+-    <groupId>com.destroystokyo.paper</groupId>
+-    <artifactId>paper-api</artifactId>
++    <groupId>io.prodity.scissors</groupId>
++    <artifactId>scissors-api</artifactId>
+     <version>1.12.2-R0.1-SNAPSHOT</version>
++    <name>Scissors-API</name>
++    <description>An enhanced plugin API for Minecraft servers.</description>
++    <url>https://github.com/prodityservices/scissors</url>
+     <packaging>jar</packaging>
+ 
+-    <name>Paper-API</name>
+-    <url>https://github.com/PaperMC/Paper</url>
+-    <description>An enhanced plugin API for Minecraft servers.</description>
++    <parent>
++        <groupId>io.prodity.scissors</groupId>
++        <artifactId>scissors-parent</artifactId>
++        <version>dev-SNAPSHOT</version>
++    </parent>
+ 
+     <properties>
+         <!-- Paper - Bump to 1.8 - Get off your dinosaur and get on this rocket ship... -->
+@@ -36,13 +35,6 @@
+         </snapshotRepository>
+     </distributionManagement>
+ 
+-    <pluginRepositories>
+-        <pluginRepository>
+-            <id>spigotmc-public</id>
+-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+-        </pluginRepository>
+-    </pluginRepositories>
+-
+     <repositories>
+         <repository>
+             <id>spigotmc-public</id>
+@@ -54,6 +46,13 @@
+         </repository>
+     </repositories>
+ 
++    <pluginRepositories>
++        <pluginRepository>
++            <id>spigotmc-public</id>
++            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
++        </pluginRepository>
++    </pluginRepositories>
++
+     <dependencies>
+         <dependency>
+             <groupId>net.sf.trove4j</groupId>
+-- 
+2.7.4
+

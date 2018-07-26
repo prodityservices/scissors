@@ -7,14 +7,9 @@ workdir="$basedir/Paper/work"
 gitcmd="git -c commit.gpgsign=false -c core.safecrlf=false"
 
 echo "Rebuilding patch files from current fork state..."
-git config core.safecrlf false
 
 function cleanupPatches {
     cd "$1"
-	if [ ! -f *.patch ]; then
-        echo "  No patches to clean up"
-		return 0
-	fi
     for patch in *.patch; do
         echo "$patch"
         gitver=$(tail -n 2 "$patch" | grep -ve "^$" | tail -n 1)
@@ -63,6 +58,6 @@ function savePatches {
     echo "  Patches saved for $what to $what_name-Patches/"
 }
 
-savePatches "Paper/Paper-API" "Scissors-API"
-savePatches "Paper/Paper-Server" "Scissors-Server"
+savePatches "$basedir/Paper/Paper-API" "Scissors-API"
+savePatches "$basedir/Paper/Paper-Server" "Scissors-Server"
 )

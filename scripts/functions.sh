@@ -13,11 +13,11 @@ colorend() {
     echo -e "\e[m"
 }
 
-paperstash() {
+scissorsstash() {
     STASHED=$($gitcmd stash  2>/dev/null|| return 0) # errors are ok
 }
 
-paperunstash() {
+scissorsunstash() {
     if [[ "$STASHED" != "No local changes to save" ]] ; then
         $gitcmd stash pop 2>/dev/null|| return 0 # errors are ok
     fi
