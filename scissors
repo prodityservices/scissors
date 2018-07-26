@@ -93,7 +93,7 @@ case "$1" in
     "c" | "clean")
         rm -rf Scissors-API
         rm -rf Scissors-Server
-		rm -rf Paper/work
+		rm -rf Paper
         rm -rf work
         echo "Cleaned build files"
     ;;

@@ -3,7 +3,6 @@
 (
 PS1="$"
 basedir="$(cd "$1" && pwd -P)"
-workdir="$basedir/Paper/work"
 gitcmd="git -c commit.gpgsign=false"
 applycmd="$gitcmd am --3way --ignore-whitespace"
 # Windows detection to workaround ARG_MAX limitation
@@ -29,11 +28,16 @@ function applyPatch {
 
     echo "Resetting $target to $what_name..."
     $gitcmd remote rm upstream > /dev/null 2>&1
-    $gitcmd remote add upstream "$basedir/$what" >/dev/null 2>&1
+    $gitcmd remote add -f upstream "../$what" >/dev/null 2>&1
     $gitcmd checkout master 2>/dev/null || $gitcmd checkout -b master
     $gitcmd fetch upstream >/dev/null 2>&1
     $gitcmd reset --hard upstream/upstream
-
+	
+	if [ ! -f "$basedir/${what_name}-Patches/"*.patch ]; then
+        echo "  No patches found to apply to $target!"
+		return 0
+	fi
+	
     echo "  Applying patches to $target..."
 
     $gitcmd am --abort >/dev/null 2>&1
@@ -67,9 +71,14 @@ function applyPatch {
     fi
 }
 
+# Move into paper dir
+pushd Paper
+basedir=$basedir/Paper
+
 # Move into spigot dir
-cd "$workdir/Spigot"
-basedir=$(pwd)
+pushd work/Spigot
+basedir=$basedir/work/Spigot
+
 # Apply Spigot
 (
     applyPatch ../Bukkit Spigot-API HEAD &&
@@ -78,31 +87,39 @@ basedir=$(pwd)
     echo "Failed to apply Spigot Patches"
     exit 1
 ) || exit 1
-# Move out of Spigot
-basedir="$1"
-cd "$basedir"
 
-echo "Importing MC Dev"
+# Move out of Spigot
+popd
+basedir=$(dirname $(dirname "$basedir"))
+
+echo "Importing Paper MC Dev"
 
 ./scripts/importmcdev.sh "$basedir" >/dev/null 2>&1
 
 # Apply paper
-cd "$basedir"
 (
-    applyPatch "Paper/work/Spigot/Spigot-API" Paper-API HEAD &&
-    applyPatch "Paper/work/Spigot/Spigot-Server" Paper-Server HEAD
+    applyPatch "work/Spigot/Spigot-API" Paper-API HEAD &&
+    applyPatch "work/Spigot/Spigot-Server" Paper-Server HEAD
 ) || (
     echo "Failed to apply Paper Patches"
     exit 1
 ) || exit 1
 
+
+# Move out of paper
+popd 
+basedir=$(dirname "$basedir")
+
+echo "Importing Scissors MC Dev"
+./scripts/importmcdev.sh "$basedir" >/dev/null 2>&1
+
 # Apply Scissors
-cd "$basedir"
 (
     applyPatch "Paper/Paper-API" Scissors-API HEAD &&
     applyPatch "Paper/Paper-Server" Scissors-Server HEAD
 ) || (
-    echo "Failed to apply Scissors Patches"
+    echo "Failed to apply Paper Patches"
     exit 1
 ) || exit 1
+
 )

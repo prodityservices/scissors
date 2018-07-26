@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-pushd Paper # Scissors
-
 (
 set -e
 PS1="$"
@@ -78,5 +76,3 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 )
-
-popd # Paper

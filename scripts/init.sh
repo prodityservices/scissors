@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
-pushd Paper # Scissors
-
 (
 set -e
 PS1="$"
 basedir="$(cd "$1" && pwd -P)"
-workdir="$basedir/work"
+workdir="$basedir/Paper/work"
 minecraftversion=$(cat "$workdir/BuildData/info.json"  | grep minecraftVersion | cut -d '"' -f 4)
 decompiledir="$workdir/Minecraft/$minecraftversion"
 nms="$decompiledir/net/minecraft/server"
@@ -41,5 +39,3 @@ $gitcmd add src
 $gitcmd commit -m "CraftBukkit $ $(date)" --author="Auto <auto@mated.null>"
 $gitcmd checkout -f HEAD^
 )
-
-popd # Scissors
