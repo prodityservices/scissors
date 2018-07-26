@@ -18,13 +18,22 @@
         <module>Scissors-API</module>
     </modules>
 
-    <build>
-        <defaultGoal>clean install</defaultGoal>
-    </build>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>prodity-releases</id>
+            <name>Prodity Releases</name>
+            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>prodity-snapshots</id>
+            <name>Prodity Snapshots</name>
+            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <repositories>
         <repository>
@@ -49,16 +58,8 @@
         </repository>
     </repositories>
 
-    <distributionManagement>
-        <repository>
-            <id>prodity-releases</id>
-            <name>Prodity Releases</name>
-            <url>https://nexus.prodity.io/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>prodity-snapshots</id>
-            <name>Prodity Snapshots</name>
-            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <build>
+        <defaultGoal>clean install</defaultGoal>
+    </build>
+
 </project>
