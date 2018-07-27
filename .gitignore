@@ -55,7 +55,8 @@ run/
 
 Scissors-Server
 Scissors-API
-Paperclip.jar
-paperclip.jar
+scissors-*.jar
+scissors.jar
+scissors.properties
 paperclip-*.jar
 paperclip.properties
