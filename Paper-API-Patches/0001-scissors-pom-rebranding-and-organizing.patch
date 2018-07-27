@@ -1,11 +1,11 @@
-From ce1168e2389d48428cf37e34f2c24816fc2adb0c Mon Sep 17 00:00:00 2001
+From 587070ab819fac2391aebf1021ec33d5afbd118e Mon Sep 17 00:00:00 2001
 From: FakeNeth <cneth97@gmail.com>
 Date: Fri, 27 Jul 2018 10:20:56 -0400
 Subject: [PATCH] scissors pom rebranding and organizing
 
 
 diff --git a/pom.xml b/pom.xml
-index ae5cfd1..d222894 100644
+index ae5cfd1..d8962d4 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -3,20 +3,19 @@
@@ -39,7 +39,22 @@ index ae5cfd1..d222894 100644
  
      <properties>
          <!-- Paper - Bump to 1.8 - Get off your dinosaur and get on this rocket ship... -->
-@@ -36,13 +35,6 @@
+@@ -27,22 +26,17 @@
+ 
+     <distributionManagement>
+         <repository>
+-            <id>destroystokyo-releases</id>
+-            <url>https://destroystokyo.com/repo/repository/maven-releases/</url>
++            <id>prodity-releases</id>
++            <name>Prodity Releases</name>
++            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+         </repository>
+         <snapshotRepository>
+-            <id>destroystokyo-snapshots</id>
+-            <url>https://destroystokyo.com/repo/repository/maven-snapshots/</url>
++            <id>prodity-snapshots</id>
++            <name>Prodity Snapshots</name>
++            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
          </snapshotRepository>
      </distributionManagement>
  
@@ -53,7 +68,7 @@ index ae5cfd1..d222894 100644
      <repositories>
          <repository>
              <id>spigotmc-public</id>
-@@ -54,6 +46,13 @@
+@@ -54,6 +48,13 @@
          </repository>
      </repositories>
  
