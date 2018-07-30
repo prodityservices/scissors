@@ -1,0 +1,28 @@
+From 7dee4e2366b18f7049eb5628ca27a02af84d3aec Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Mon, 30 Jul 2018 07:27:42 -0400
+Subject: [PATCH] update guava version to 25.1-jre
+
+
+diff --git a/pom.xml b/pom.xml
+index ab476b7..f42cdd1 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -78,6 +78,14 @@
+     </profiles>
+ 
+     <dependencies>
++        <!-- Scissors - Add to override NMS guava version -->
++        <dependency>
++            <groupId>com.google.guava</groupId>
++            <artifactId>guava</artifactId>
++            <version>25.1-jre</version>
++            <scope>compile</scope>
++        </dependency>
++
+         <!-- bugfixes (netty#6607) -->
+         <dependency>
+             <groupId>io.netty</groupId>
+-- 
+2.7.4
+
