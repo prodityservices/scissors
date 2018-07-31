@@ -75,36 +75,28 @@ function applyPatch {
 pushd Paper
 basedir=$basedir/Paper
 
-# Move into spigot dir
-pushd work/Spigot
-basedir=$basedir/work/Spigot
-
 # Apply Spigot
 (
-    applyPatch ../Bukkit Spigot-API HEAD &&
-    applyPatch ../CraftBukkit Spigot-Server patched
+    applyPatch Bukkit Spigot-API HEAD &&
+    applyPatch CraftBukkit Spigot-Server patched
 ) || (
     echo "Failed to apply Spigot Patches"
     exit 1
 ) || exit 1
 
-# Move out of Spigot
-popd
-basedir=$(dirname $(dirname "$basedir"))
-
 echo "Importing Paper MC Dev"
 
-./scripts/importmcdev.sh "$basedir" >/dev/null 2>&1
+# Scissors - remove unless this is required down the road.
+# ./scripts/importmcdev.sh "$basedir" >/dev/null 2>&1  
 
 # Apply paper
 (
-    applyPatch "work/Spigot/Spigot-API" Paper-API HEAD &&
-    applyPatch "work/Spigot/Spigot-Server" Paper-Server HEAD
+    applyPatch Spigot-API Paper-API HEAD &&
+    applyPatch Spigot-Server Paper-Server HEAD
 ) || (
     echo "Failed to apply Paper Patches"
     exit 1
 ) || exit 1
-
 
 # Move out of paper
 popd 
