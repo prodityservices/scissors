@@ -43,8 +43,12 @@ echo
 cd ../Bukkit
 hash=$(git rev-parse HEAD)
 git branch -f spigot "$hash"
-applyPatch Bukkit Spigot-API origin/spigot && applyPatch CraftBukkit Spigot-Server origin/patched
+applyPatch Paper/Bukkit Paper/Spigot-API origin/spigot && applyPatch Paper/CraftBukkit Paper/Spigot-Server origin/patched
 echo
 echo "Applying PaperSpigot patches to Spigot-Server and Spigot-API"
 echo
-applyPatch Spigot-API PaperSpigot-API && applyPatch Spigot-Server PaperSpigot-Server
+applyPatch Paper/Spigot-API Paper/PaperSpigot-API && applyPatch Paper/Spigot-Server Paper/PaperSpigot-Server
+echo
+echo "Applying Scissors patches to PaperSpigot-Server and PaperSpigot-API"
+echo
+applyPatch Paper/PaperSpigot-API Scissors-API && applyPatch Paper/PaperSpigot-Server Scissors-Server

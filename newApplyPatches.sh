@@ -35,5 +35,6 @@ function applyPatch {
     fi
 }
 
-applyPatch Bukkit Spigot-API HEAD && applyPatch CraftBukkit Spigot-Server patched
-applyPatch Spigot-API PaperSpigot-API HEAD && applyPatch Spigot-Server PaperSpigot-Server HEAD
+applyPatch Paper/Bukkit Paper/Spigot-API HEAD && applyPatch Paper/CraftBukkit Paper/Spigot-Server patched
+applyPatch Paper/Spigot-API Paper/PaperSpigot-API HEAD && applyPatch Paper/Spigot-Server Paper/PaperSpigot-Server HEAD
+applyPatch Paper/PaperSpigot-API Scissors-API HEAD && applyPatch Paper/PaperSpigot-Server Scissors-Server HEAD

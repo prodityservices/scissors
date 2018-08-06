@@ -2,7 +2,7 @@
 
 PS1="$"
 basedir=`pwd`
-workdir=$basedir/work
+workdir=$basedir/Paper/work
 minecraftversion=$(cat BuildData/info.json | grep minecraftVersion | cut -d '"' -f 4)
 decompiledir=$workdir/$minecraftversion
 nms=$decompiledir/net/minecraft/server
@@ -14,7 +14,7 @@ if [ "x$patch" == "x" ]; then
 fi
 
 echo "Applying CraftBukkit patches to NMS..."
-cd "$basedir/CraftBukkit"
+cd "$basedir/Paper/CraftBukkit"
 git checkout -B patched HEAD >/dev/null 2>&1
 rm -rf $cb
 mkdir -p $cb

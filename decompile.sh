@@ -2,7 +2,7 @@
 
 PS1="$"
 basedir=`pwd`
-workdir=$basedir/work
+workdir=$basedir/Paper/work
 minecraftversion=$(cat BuildData/info.json | grep minecraftVersion | cut -d '"' -f 4)
 decompiledir=$workdir/$minecraftversion
 classdir=$decompiledir/classes
