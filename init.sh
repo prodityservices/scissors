@@ -3,7 +3,7 @@
 PS1="$"
 basedir=`pwd`
 workdir=$basedir/Paper/work
-minecraftversion=$(cat BuildData/info.json | grep minecraftVersion | cut -d '"' -f 4)
+minecraftversion=$(cat Paper/BuildData/info.json | grep minecraftVersion | cut -d '"' -f 4)
 decompiledir=$workdir/$minecraftversion
 nms=$decompiledir/net/minecraft/server
 cb=src/main/java/net/minecraft/server

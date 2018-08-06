@@ -20,10 +20,16 @@ function applyPatch {
     cd "$basedir/$target"
     echo "Resetting $target to $what..."
     git remote rm upstream 2>/dev/null 2>&1
-    git remote add upstream ../$what >/dev/null 2>&1
+    git remote add upstream $basedir/$what >/dev/null 2>&1
     git checkout master >/dev/null 2>&1
     git fetch upstream >/dev/null 2>&1
     git reset --hard upstream/upstream
+
+	if [ ! -f "$basedir/${what}-Patches/"*.patch ]; then
+        echo "  No patches found to apply to $target!"
+		return 0
+	fi
+	
     echo "  Applying patches to $target..."
     git am --abort
     git am --3way "$basedir/${what}-Patches/"*.patch
@@ -37,18 +43,25 @@ function applyPatch {
     fi
 }
 
+cd $basedir
+
+pushd Paper
+
+basedir=$basedir/Paper
+
 echo
 echo "Applying SpigotMC patches to CraftBukkit and Bukkit"
 echo
-cd ../Bukkit
 hash=$(git rev-parse HEAD)
 git branch -f spigot "$hash"
-applyPatch Paper/Bukkit Paper/Spigot-API origin/spigot && applyPatch Paper/CraftBukkit Paper/Spigot-Server origin/patched
+applyPatch Bukkit Spigot-API origin/spigot && applyPatch CraftBukkit Spigot-Server origin/patched
 echo
 echo "Applying PaperSpigot patches to Spigot-Server and Spigot-API"
 echo
-applyPatch Paper/Spigot-API Paper/PaperSpigot-API && applyPatch Paper/Spigot-Server Paper/PaperSpigot-Server
+applyPatch Spigot-API PaperSpigot-API && applyPatch Spigot-Server PaperSpigot-Server
 echo
 echo "Applying Scissors patches to PaperSpigot-Server and PaperSpigot-API"
 echo
-applyPatch Paper/PaperSpigot-API Scissors-API && applyPatch Paper/PaperSpigot-Server Scissors-Server
+applyPatch PaperSpigot-API ../Scissors-API && applyPatch PaperSpigot-Server ../Scissors-Server
+
+popd

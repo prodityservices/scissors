@@ -62,7 +62,7 @@ if [ ! -f "$jarpath-mapped.jar" ]; then
 fi
 
 echo "Installing remapped jar..."
-cd CraftBukkit # Need to be in a directory with a valid POM at the time of install.
+cd Paper/CraftBukkit # Need to be in a directory with a valid POM at the time of install.
 mvn install:install-file -q -Dfile="$jarpath-mapped.jar" -Dpackaging=jar -DgroupId=org.spigotmc -DartifactId=minecraft-server -Dversion="$minecraftversion-SNAPSHOT"
 if [ "$?" != "0" ]; then
     echo "Failed to install remapped jar."

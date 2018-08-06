@@ -6,6 +6,12 @@ echo "Rebuilding patch files from current fork state..."
 
 function cleanupPatches {
     cd "$1"
+	
+	if [ ! -f *.patch ]; then
+        echo "  No patches found to clean in $1"
+		return 0
+	fi
+
     for patch in *.patch; do
         gitver=$(tail -n 2 $patch | grep -ve "^$" | tail -n 1)
         diffs=$(git diff --staged $patch | grep -E "^(\+|\-)" | grep -Ev "(From [a-z0-9]{32,}|\-\-\- a|\+\+\+ b|.index)")
