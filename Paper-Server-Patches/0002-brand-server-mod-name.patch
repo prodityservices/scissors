@@ -1,0 +1,22 @@
+From 1191fcb3e2bcabc3cb66c8591cc34e85719976dc Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Tue, 7 Aug 2018 12:55:15 -0400
+Subject: [PATCH] brand server mod name
+
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index b400ce0..95aa925 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1084,7 +1084,7 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+     }
+ 
+     public String getServerModName() {
+-        return "PaperSpigot"; // PaperSpigot - PaperSpigot > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
++        return "scissors"; // Scissors - scissors > // PaperSpigot - PaperSpigot > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
+     }
+ 
+     public CrashReport b(CrashReport crashreport) {
+-- 
+2.7.4
+

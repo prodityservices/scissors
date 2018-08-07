@@ -1,0 +1,95 @@
+From 77bb99ddfa151a1c7edae925cebba3bc85ef8af4 Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Tue, 7 Aug 2018 12:27:56 -0400
+Subject: [PATCH] organize pom.xml for scissors
+
+
+diff --git a/pom.xml b/pom.xml
+index 6aaba50..c9cd15c 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -1,12 +1,20 @@
+ <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+-    <groupId>org.github.paperspigot</groupId>
+-    <artifactId>paperspigot</artifactId>
+-    <packaging>jar</packaging>
++
++    <parent>
++        <groupId>io.prodity.scissors</groupId>
++        <artifactId>scissors-parent</artifactId>
++        <version>dev-SNAPSHOT</version>
++    </parent>
++
++    <groupId>io.prodity.scissors</groupId>
++    <artifactId>scissors</artifactId>
+     <version>1.8.8-R0.1-SNAPSHOT</version>
+-    <name>PaperSpigot</name>
+-    <url>https://hub.spigotmc.org/stash/projects/PAPER/</url>
++    <packaging>jar</packaging>
++
++    <name>Scissors</name>
++    <url>https://github.com/prodityservices/scissors</url>
+ 
+     <properties>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+@@ -21,12 +29,18 @@
+         <maven.compiler.target>1.8</maven.compiler.target>
+     </properties>
+ 
+-    <parent>
+-        <groupId>org.github.paperspigot</groupId>
+-        <artifactId>paperspigot-parent</artifactId>
+-        <version>dev-SNAPSHOT</version>
+-        <relativePath>../pom.xml</relativePath>
+-    </parent>
++    <!-- required until fixed plexus-compiler-eclipse is deployed -->
++    <pluginRepositories>
++        <pluginRepository>
++            <id>spigotmc-public</id>
++            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
++        </pluginRepository>
++        <!-- PaperSpigot - Repo for gitdescribe -->
++        <pluginRepository>
++            <id>destroystokyo</id>
++            <url>https://ci.destroystokyo.com/plugin/repository/everything/</url>
++        </pluginRepository>
++    </pluginRepositories>
+ 
+     <dependencies>
+         <dependency>
+@@ -35,8 +49,8 @@
+             <version>3.0.3</version>
+         </dependency>
+         <dependency>
+-            <groupId>org.github.paperspigot</groupId>
+-            <artifactId>paperspigot-api</artifactId>
++            <groupId>io.prodity.scissors</groupId>
++            <artifactId>scissors-api</artifactId>
+             <version>${project.version}</version>
+             <type>jar</type>
+             <scope>compile</scope>
+@@ -91,19 +105,6 @@
+         </dependency>
+     </dependencies>
+ 
+-    <!-- required until fixed plexus-compiler-eclipse is deployed -->
+-    <pluginRepositories>
+-        <pluginRepository>
+-            <id>spigotmc-public</id>
+-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+-        </pluginRepository>
+-        <!-- PaperSpigot - Repo for gitdescribe -->
+-        <pluginRepository>
+-            <id>destroystokyo</id>
+-            <url>https://ci.destroystokyo.com/plugin/repository/everything/</url>
+-        </pluginRepository>
+-    </pluginRepositories>
+-
+     <!-- This builds a completely 'ready to start' jar with all dependencies inside -->
+     <build>
+         <defaultGoal>install</defaultGoal>
+-- 
+2.7.4
+
