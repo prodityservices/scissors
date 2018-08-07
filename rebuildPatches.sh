@@ -54,5 +54,5 @@ function savePatches {
     echo "  Patches saved for $what to $what_name-Patches/"
 }
 
-savePatches "$basedir/Paper/Paper-API" "Scissors-API"
-savePatches "$basedir/Paper/Paper-Server" "Scissors-Server"
+savePatches "$basedir/Paper/PaperSpigot-API" "Scissors-API"
+savePatches "$basedir/Paper/PaperSpigot-Server" "Scissors-Server"
