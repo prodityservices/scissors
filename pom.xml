@@ -3,45 +3,50 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
-
-    <groupId>org.github.paperspigot</groupId>
-    <artifactId>paperspigot-parent</artifactId>
+    <groupId>io.prodity.scissors</groupId>
+    <artifactId>scissors-parent</artifactId>
     <version>dev-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>PaperSpigot-Parent</name>
-    <description>Parent project for all PaperSpigot modules.</description>
-    <url>https://github.com/PaperSpigot/Spigot</url>
+    <name>Scissors-Parent</name>
+    <description>Parent project for all Scissors modules</description>
+    <url>https://github.com/prodityservices/scissors</url>
 
     <modules>
-        <module>PaperSpigot-Server</module>
-        <module>PaperSpigot-API</module>
+        <module>Scissors-Server</module>
+        <module>Scissors-API</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+	
+	<distributionManagement>
+        <repository>
+            <id>prodity-releases</id>
+            <name>Prodity Releases</name>
+            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>prodity-snapshots</id>
+            <name>Prodity Snapshots</name>
+            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <repositories>
         <repository>
             <id>md_5-releases</id>
             <url>http://repo.md-5.net/content/repositories/releases/</url>
         </repository>
+		<repository>
+            <id>prodity-snapshots</id>
+            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
+        </repository>
+        <repository>
+            <id>prodity-releases</id>
+            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+        </repository>
     </repositories>
 
-    <distributionManagement>
-        <repository>
-            <id>destroystokyo-releases</id>
-            <url>https://repo.destroystokyo.com/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>destroystokyo-snapshots</id>
-            <url>https://repo.destroystokyo.com/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
