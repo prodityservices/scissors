@@ -1,0 +1,27 @@
+From a67f1fcc4a822b41b92ff50f57329645f6cc883e Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Tue, 7 Aug 2018 14:32:51 -0400
+Subject: [PATCH] update guava version to latest
+
+
+diff --git a/pom.xml b/pom.xml
+index 65051f2..165f6cd 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -68,11 +68,11 @@
+             <type>jar</type>
+             <scope>compile</scope>
+         </dependency>
+-        <!-- bundled with Minecraft, should be kept in sync -->
++        <!-- Scissors - Add to override NMS guava version -->
+         <dependency>
+             <groupId>com.google.guava</groupId>
+             <artifactId>guava</artifactId>
+-            <version>17.0</version>
++            <version>25.1-jre</version>
+             <scope>compile</scope>
+         </dependency>
+         <!-- bundled with Minecraft, should be kept in sync -->
+-- 
+2.7.4
+
