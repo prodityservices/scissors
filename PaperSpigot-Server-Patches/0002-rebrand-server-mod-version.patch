@@ -1,7 +1,7 @@
-From 5f4052b60d2f01136498f665e45d12affb02c3df Mon Sep 17 00:00:00 2001
+From 405c4709a4b5e88e26a9ee86471bbdadf4468a90 Mon Sep 17 00:00:00 2001
 From: FakeNeth <cneth97@gmail.com>
-Date: Tue, 7 Aug 2018 13:08:08 -0400
-Subject: [PATCH] brand server mod name
+Date: Tue, 7 Aug 2018 13:52:07 -0400
+Subject: [PATCH] rebrand server mod version
 
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
