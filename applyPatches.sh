@@ -55,4 +55,7 @@ popd
 
 basedir=$(dirname "$basedir")
 
+echo "Importing Scissors MC Dev"
+./importmcdev.sh "$basedir"
+
 applyPatch Paper/PaperSpigot-API Scissors-API HEAD && applyPatch Paper/PaperSpigot-Server Scissors-Server HEAD
