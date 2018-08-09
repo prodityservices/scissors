@@ -1,0 +1,39 @@
+From d2e5e76fbb48609d108899dabfab91a1cd403347 Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Wed, 8 Aug 2018 14:32:03 -0400
+Subject: [PATCH] versioning fixes
+
+
+diff --git a/src/main/java/org/bukkit/command/defaults/VersionCommand.java b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
+index e91e1d8..01719be 100644
+--- a/src/main/java/org/bukkit/command/defaults/VersionCommand.java
++++ b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
+@@ -185,8 +185,24 @@ public class VersionCommand extends BukkitCommand {
+     private void obtainVersion() {
+         String version = Bukkit.getVersion();
+         if (version == null) version = "Custom";
++        // Scissors start
++        if (version.startsWith("git-Scissors-")) {
++            setVersionMessage("Scissors version information currently disabled.");
++//            String[] parts = version.substring("git-Scissors-".length()).split("[-\\s]");
++//            int scissorsVersions = getDistance("scissors", parts[0]);
++//            if (scissorsVersions == -1) {
++//                setVersionMessage("Error obtaining version information");
++//            } else {
++//                if (scissorsVersions == 0) {
++//                    setVersionMessage("You are running the latest version");
++//                } else {
++//                    setVersionMessage("You are " + scissorsVersions + " version(s) behind");
++//                }
++//            }
++        }
+         // PaperSpigot start
+-        if (version.startsWith("git-PaperSpigot-")) {
++        else if (version.startsWith("git-PaperSpigot-")) {
++        // Scissors end
+             String[] parts = version.substring("git-PaperSpigot-".length()).split("[-\\s]");
+             int paperSpigotVersions = getDistance("paperspigot", parts[0]);
+             if (paperSpigotVersions == -1) {
+-- 
+2.7.4
+
