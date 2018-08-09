@@ -1,0 +1,278 @@
+From 47d8b477023476d5d6dc8401856c1870e7272132 Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Thu, 9 Aug 2018 13:47:09 -0400
+Subject: [PATCH] mc dev fixes
+
+
+diff --git a/src/main/java/net/minecraft/server/BlockStateList.java b/src/main/java/net/minecraft/server/BlockStateList.java
+index 8a815a6..f38c6dd 100644
+--- a/src/main/java/net/minecraft/server/BlockStateList.java
++++ b/src/main/java/net/minecraft/server/BlockStateList.java
+@@ -123,7 +123,7 @@ public class BlockStateList {
+             if (!this.b.containsKey(iblockstate)) {
+                 throw new IllegalArgumentException("Cannot get property " + iblockstate + " as it does not exist in " + this.a.P());
+             } else {
+-                return (Comparable) iblockstate.b().cast(this.b.get(iblockstate));
++                return (T) iblockstate.b().cast(this.b.get(iblockstate)); // Scissors - cast to T
+             }
+         }
+ 
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java b/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java
+index ab4520b..b02a68f 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutPlayerInfo.java
+@@ -8,7 +8,7 @@ import java.io.IOException;
+ import java.util.Iterator;
+ import java.util.List;
+ 
+-public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
++public class PacketPlayOutPlayerInfo extends PacketPlayOutPlayerInfoPacket {
+ 
+     private PacketPlayOutPlayerInfo.EnumPlayerInfoAction a;
+     private final List<PacketPlayOutPlayerInfo.PlayerInfoData> b = Lists.newArrayList();
+@@ -51,47 +51,47 @@ public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
+             IChatBaseComponent ichatbasecomponent = null;
+ 
+             switch (PacketPlayOutPlayerInfo.SyntheticClass_1.a[this.a.ordinal()]) {
+-            case 1:
+-                gameprofile = new GameProfile(packetdataserializer.g(), packetdataserializer.c(16));
+-                int l = packetdataserializer.e();
++                case 1:
++                    gameprofile = new GameProfile(packetdataserializer.g(), packetdataserializer.c(16));
++                    int l = packetdataserializer.e();
++
++                    for (int i1 = 0; i1 < l; ++i1) {
++                        String s = packetdataserializer.c(32767);
++                        String s1 = packetdataserializer.c(32767);
++
++                        if (packetdataserializer.readBoolean()) {
++                            gameprofile.getProperties().put(s, new Property(s, s1, packetdataserializer.c(32767)));
++                        } else {
++                            gameprofile.getProperties().put(s, new Property(s, s1));
++                        }
++                    }
++
++                    worldsettings_enumgamemode = WorldSettings.EnumGamemode.getById(packetdataserializer.e());
++                    k = packetdataserializer.e();
++                    if (packetdataserializer.readBoolean()) {
++                        ichatbasecomponent = packetdataserializer.d();
++                    }
++                    break;
+ 
+-                for (int i1 = 0; i1 < l; ++i1) {
+-                    String s = packetdataserializer.c(32767);
+-                    String s1 = packetdataserializer.c(32767);
++                case 2:
++                    gameprofile = new GameProfile(packetdataserializer.g(), (String) null);
++                    worldsettings_enumgamemode = WorldSettings.EnumGamemode.getById(packetdataserializer.e());
++                    break;
+ 
++                case 3:
++                    gameprofile = new GameProfile(packetdataserializer.g(), (String) null);
++                    k = packetdataserializer.e();
++                    break;
++
++                case 4:
++                    gameprofile = new GameProfile(packetdataserializer.g(), (String) null);
+                     if (packetdataserializer.readBoolean()) {
+-                        gameprofile.getProperties().put(s, new Property(s, s1, packetdataserializer.c(32767)));
+-                    } else {
+-                        gameprofile.getProperties().put(s, new Property(s, s1));
++                        ichatbasecomponent = packetdataserializer.d();
+                     }
+-                }
+-
+-                worldsettings_enumgamemode = WorldSettings.EnumGamemode.getById(packetdataserializer.e());
+-                k = packetdataserializer.e();
+-                if (packetdataserializer.readBoolean()) {
+-                    ichatbasecomponent = packetdataserializer.d();
+-                }
+-                break;
+-
+-            case 2:
+-                gameprofile = new GameProfile(packetdataserializer.g(), (String) null);
+-                worldsettings_enumgamemode = WorldSettings.EnumGamemode.getById(packetdataserializer.e());
+-                break;
+-
+-            case 3:
+-                gameprofile = new GameProfile(packetdataserializer.g(), (String) null);
+-                k = packetdataserializer.e();
+-                break;
+-
+-            case 4:
+-                gameprofile = new GameProfile(packetdataserializer.g(), (String) null);
+-                if (packetdataserializer.readBoolean()) {
+-                    ichatbasecomponent = packetdataserializer.d();
+-                }
+-                break;
+-
+-            case 5:
+-                gameprofile = new GameProfile(packetdataserializer.g(), (String) null);
++                    break;
++
++                case 5:
++                    gameprofile = new GameProfile(packetdataserializer.g(), (String) null);
+             }
+ 
+             this.b.add(new PacketPlayOutPlayerInfo.PlayerInfoData(gameprofile, k, worldsettings_enumgamemode, ichatbasecomponent));
+@@ -108,71 +108,67 @@ public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
+             PacketPlayOutPlayerInfo.PlayerInfoData packetplayoutplayerinfo_playerinfodata = (PacketPlayOutPlayerInfo.PlayerInfoData) iterator.next();
+ 
+             switch (PacketPlayOutPlayerInfo.SyntheticClass_1.a[this.a.ordinal()]) {
+-            case 1:
+-                packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
+-                packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getName());
+-                packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.a().getProperties().size());
+-                Iterator iterator1 = packetplayoutplayerinfo_playerinfodata.a().getProperties().values().iterator();
+-
+-                while (iterator1.hasNext()) {
+-                    Property property = (Property) iterator1.next();
+-
+-                    packetdataserializer.a(property.getName());
+-                    packetdataserializer.a(property.getValue());
+-                    if (property.hasSignature()) {
+-                        packetdataserializer.writeBoolean(true);
+-                        packetdataserializer.a(property.getSignature());
++                case 1:
++                    packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
++                    packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getName());
++                    packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.a().getProperties().size());
++                    Iterator iterator1 = packetplayoutplayerinfo_playerinfodata.a().getProperties().values().iterator();
++
++                    while (iterator1.hasNext()) {
++                        Property property = (Property) iterator1.next();
++
++                        packetdataserializer.a(property.getName());
++                        packetdataserializer.a(property.getValue());
++                        if (property.hasSignature()) {
++                            packetdataserializer.writeBoolean(true);
++                            packetdataserializer.a(property.getSignature());
++                        } else {
++                            packetdataserializer.writeBoolean(false);
++                        }
++                    }
++
++                    packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.c().getId());
++                    packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.b());
++                    if (packetplayoutplayerinfo_playerinfodata.d() == null) {
++                        packetdataserializer.writeBoolean(false);
+                     } else {
++                        packetdataserializer.writeBoolean(true);
++                        packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.d());
++                    }
++                    break;
++
++                case 2:
++                    packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
++                    packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.c().getId());
++                    break;
++
++                case 3:
++                    packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
++                    packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.b());
++                    break;
++
++                case 4:
++                    packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
++                    if (packetplayoutplayerinfo_playerinfodata.d() == null) {
+                         packetdataserializer.writeBoolean(false);
++                    } else {
++                        packetdataserializer.writeBoolean(true);
++                        packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.d());
+                     }
+-                }
+-
+-                packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.c().getId());
+-                packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.b());
+-                if (packetplayoutplayerinfo_playerinfodata.d() == null) {
+-                    packetdataserializer.writeBoolean(false);
+-                } else {
+-                    packetdataserializer.writeBoolean(true);
+-                    packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.d());
+-                }
+-                break;
+-
+-            case 2:
+-                packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
+-                packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.c().getId());
+-                break;
+-
+-            case 3:
+-                packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
+-                packetdataserializer.b(packetplayoutplayerinfo_playerinfodata.b());
+-                break;
+-
+-            case 4:
+-                packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
+-                if (packetplayoutplayerinfo_playerinfodata.d() == null) {
+-                    packetdataserializer.writeBoolean(false);
+-                } else {
+-                    packetdataserializer.writeBoolean(true);
+-                    packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.d());
+-                }
+-                break;
+-
+-            case 5:
+-                packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
++                    break;
++
++                case 5:
++                    packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
+             }
+         }
+ 
+     }
+ 
+-    public void a(PacketListenerPlayOut packetlistenerplayout) {
+-        packetlistenerplayout.a(this);
+-    }
+-
+     public String toString() {
+         return Objects.toStringHelper(this).add("action", this.a).add("entries", this.b).toString();
+     }
+ 
+-    public void a(PacketListener packetlistener) {
++    public void a1(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
+ 
+@@ -256,3 +252,18 @@ public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
+         private EnumPlayerInfoAction() {}
+     }
+ }
++
++abstract class PacketPlayOutPlayerInfoPacket implements Packet<PacketListenerPlayOut> {
++
++    private PacketPlayOutPlayerInfo handle;
++
++    void setHandle(PacketPlayOutPlayerInfo handle) {
++        this.handle = handle;
++    }
++
++    @Override
++    public void a(PacketListenerPlayOut packetListenerPlayOut) {
++        packetListenerPlayOut.a(this.handle);
++    }
++
++}
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/server/ShapeDetector.java b/src/main/java/net/minecraft/server/ShapeDetector.java
+index 325dcc6..fa29a4c 100644
+--- a/src/main/java/net/minecraft/server/ShapeDetector.java
++++ b/src/main/java/net/minecraft/server/ShapeDetector.java
+@@ -164,8 +164,10 @@ public class ShapeDetector {
+             return new ShapeDetectorBlock(this.a, blockposition, this.b);
+         }
+ 
+-        public Object load(Object object) throws Exception {
+-            return this.a((BlockPosition) object);
++        // Scissors start - fix compile issue
++        public ShapeDetectorBlock load(BlockPosition object) throws Exception {
++            return this.a(object);
+         }
++        // Scissors end
+     }
+ }
+-- 
+2.7.4
+

@@ -42,12 +42,12 @@ function importAll {
 )
 
 # Scissors imports
+import BlockState
 import BlockStateList
 import PacketPlayOutPlayerInfo
-import WorldGenCaves
 import ShapeDetector
-import BlockState
 import StructureBoundingBox
+import WorldGenCaves
 
 cd "$workdir/PaperSpigot-Server/"
 rm -rf nms-patches applyPatches.sh makePatches.sh >/dev/null 2>&1
