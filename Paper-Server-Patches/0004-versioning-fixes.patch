@@ -1,0 +1,673 @@
+From 2bdc73f42e5be82ce7d8ed2bbf0f13f680fd7e13 Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Thu, 9 Aug 2018 08:19:36 -0400
+Subject: [PATCH] versioning fixes
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 80702f6..050ee94 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -1,5 +1,17 @@
+ package org.bukkit.craftbukkit;
+ 
++import com.google.common.base.Charsets;
++import com.google.common.base.Function;
++import com.google.common.base.Preconditions;
++import com.google.common.collect.ImmutableList;
++import com.google.common.collect.Iterators;
++import com.google.common.collect.Lists;
++import com.google.common.collect.MapMaker;
++import com.mojang.authlib.GameProfile;
++import io.netty.buffer.ByteBuf;
++import io.netty.buffer.ByteBufOutputStream;
++import io.netty.buffer.Unpooled;
++import io.netty.handler.codec.base64.Base64;
+ import java.awt.image.BufferedImage;
+ import java.io.File;
+ import java.io.FileInputStream;
+@@ -19,17 +31,62 @@ import java.util.Set;
+ import java.util.UUID;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+-import java.util.regex.Pattern;
+-
++import javax.annotation.Nonnull;
++import javax.annotation.Nullable;
+ import javax.imageio.ImageIO;
+-
+-import net.minecraft.server.*;
+-
++import net.md_5.bungee.api.chat.BaseComponent;
++import net.minecraft.server.Advancement;
++import net.minecraft.server.AdvancementRewards;
++import net.minecraft.server.BlockPosition;
++import net.minecraft.server.CommandAbstract;
++import net.minecraft.server.CommandDispatcher;
++import net.minecraft.server.CommandListenerWrapper;
++import net.minecraft.server.Convertable;
++import net.minecraft.server.CraftingManager;
++import net.minecraft.server.DedicatedPlayerList;
++import net.minecraft.server.DedicatedServer;
++import net.minecraft.server.Enchantments;
++import net.minecraft.server.EntityPlayer;
++import net.minecraft.server.EntityTracker;
++import net.minecraft.server.EnumDifficulty;
++import net.minecraft.server.EnumGamemode;
++import net.minecraft.server.ExceptionWorldConflict;
++import net.minecraft.server.ICommand;
++import net.minecraft.server.ICommandListener;
++import net.minecraft.server.IDataManager;
++import net.minecraft.server.IProgressUpdate;
++import net.minecraft.server.Items;
++import net.minecraft.server.JsonListEntry;
++import net.minecraft.server.LocaleI18n;
++import net.minecraft.server.MCUtil;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.MobEffects;
++import net.minecraft.server.PersistentCollection;
++import net.minecraft.server.PlayerList;
++import net.minecraft.server.PropertyManager;
++import net.minecraft.server.RecipesFurnace;
++import net.minecraft.server.RegionFile;
++import net.minecraft.server.RegionFileCache;
++import net.minecraft.server.RegistryMaterials;
++import net.minecraft.server.ServerCommand;
++import net.minecraft.server.ServerNBTManager;
++import net.minecraft.server.TileEntitySign;
++import net.minecraft.server.WorldData;
++import net.minecraft.server.WorldLoaderServer;
++import net.minecraft.server.WorldManager;
++import net.minecraft.server.WorldMap;
++import net.minecraft.server.WorldNBTStorage;
++import net.minecraft.server.WorldServer;
++import net.minecraft.server.WorldSettings;
++import net.minecraft.server.WorldType;
++import org.apache.commons.lang.StringUtils;
++import org.apache.commons.lang.Validate;
+ import org.bukkit.BanList;
+ import org.bukkit.Bukkit;
+ import org.bukkit.ChatColor;
+ import org.bukkit.GameMode;
+ import org.bukkit.Location;
++import org.bukkit.NamespacedKey;
+ import org.bukkit.OfflinePlayer;
+ import org.bukkit.Server;
+ import org.bukkit.UnsafeValues;
+@@ -73,25 +130,27 @@ import org.bukkit.craftbukkit.scheduler.CraftScheduler;
+ import org.bukkit.craftbukkit.scoreboard.CraftScoreboardManager;
+ import org.bukkit.craftbukkit.util.CraftIconCache;
+ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
++import org.bukkit.craftbukkit.util.CraftNamespacedKey;
+ import org.bukkit.craftbukkit.util.DatFileFilter;
+ import org.bukkit.craftbukkit.util.Versioning;
+ import org.bukkit.craftbukkit.util.permissions.CraftDefaultPermissions;
+ import org.bukkit.entity.Entity;
+ import org.bukkit.entity.Player;
+-import org.bukkit.event.command.UnknownCommandEvent; // Paper
++import org.bukkit.event.command.UnknownCommandEvent;
+ import org.bukkit.event.inventory.InventoryType;
+ import org.bukkit.event.player.PlayerChatTabCompleteEvent;
+ import org.bukkit.event.server.BroadcastMessageEvent;
++import org.bukkit.event.server.TabCompleteEvent;
+ import org.bukkit.event.world.WorldInitEvent;
+ import org.bukkit.event.world.WorldLoadEvent;
+ import org.bukkit.event.world.WorldUnloadEvent;
+ import org.bukkit.generator.ChunkGenerator;
+ import org.bukkit.help.HelpMap;
+ import org.bukkit.inventory.FurnaceRecipe;
+-import org.bukkit.inventory.ItemStack;
+-import org.bukkit.inventory.Merchant;
+ import org.bukkit.inventory.Inventory;
+ import org.bukkit.inventory.InventoryHolder;
++import org.bukkit.inventory.ItemStack;
++import org.bukkit.inventory.Merchant;
+ import org.bukkit.inventory.Recipe;
+ import org.bukkit.inventory.ShapedRecipe;
+ import org.bukkit.inventory.ShapelessRecipe;
+@@ -105,42 +164,20 @@ import org.bukkit.plugin.SimplePluginManager;
+ import org.bukkit.plugin.SimpleServicesManager;
+ import org.bukkit.plugin.java.JavaPluginLoader;
+ import org.bukkit.plugin.messaging.Messenger;
++import org.bukkit.plugin.messaging.StandardMessenger;
+ import org.bukkit.potion.Potion;
+ import org.bukkit.potion.PotionEffectType;
+-import org.bukkit.plugin.messaging.StandardMessenger;
+ import org.bukkit.scheduler.BukkitWorker;
+ import org.bukkit.util.StringUtil;
+ import org.bukkit.util.permissions.DefaultPermissions;
+ import org.yaml.snakeyaml.Yaml;
+ import org.yaml.snakeyaml.constructor.SafeConstructor;
+ import org.yaml.snakeyaml.error.MarkedYAMLException;
+-import org.apache.commons.lang.Validate;
+-
+-import com.google.common.base.Charsets;
+-import com.google.common.base.Function;
+-import com.google.common.base.Preconditions;
+-import com.google.common.collect.ImmutableList;
+-import com.google.common.collect.Iterators;
+-import com.google.common.collect.Lists;
+-import com.google.common.collect.MapMaker;
+-import com.mojang.authlib.GameProfile;
+-
+-import io.netty.buffer.ByteBuf;
+-import io.netty.buffer.ByteBufOutputStream;
+-import io.netty.buffer.Unpooled;
+-import io.netty.handler.codec.base64.Base64;
+-import org.apache.commons.lang.StringUtils;
+-import org.bukkit.NamespacedKey;
+-import org.bukkit.craftbukkit.util.CraftNamespacedKey;
+-import org.bukkit.event.server.TabCompleteEvent;
+-import net.md_5.bungee.api.chat.BaseComponent;
+-
+-import javax.annotation.Nullable; // Paper
+-import javax.annotation.Nonnull; // Paper
+ 
+ 
+ public final class CraftServer implements Server {
+-    private final String serverName = "Paper";
++
++    private final String serverName = "Scissors";
+     private final String serverVersion;
+     private final String bukkitVersion = Versioning.getBukkitVersion();
+     private final Logger logger = Logger.getLogger("Minecraft");
+@@ -181,6 +218,7 @@ public final class CraftServer implements Server {
+     public static Exception excessiveVelEx; // Paper - Velocity warnings
+ 
+     private final class BooleanWrapper {
++
+         private boolean value = true;
+     }
+ 
+@@ -218,7 +256,8 @@ public final class CraftServer implements Server {
+ 
+         configuration = YamlConfiguration.loadConfiguration(getConfigFile());
+         configuration.options().copyDefaults(true);
+-        configuration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("configurations/bukkit.yml"), Charsets.UTF_8)));
++        configuration.setDefaults(YamlConfiguration.loadConfiguration(
++            new InputStreamReader(getClass().getClassLoader().getResourceAsStream("configurations/bukkit.yml"), Charsets.UTF_8)));
+         ConfigurationSection legacyAlias = null;
+         if (!configuration.isString("aliases")) {
+             legacyAlias = configuration.getConfigurationSection("aliases");
+@@ -230,7 +269,8 @@ public final class CraftServer implements Server {
+         }
+         commandsConfiguration = YamlConfiguration.loadConfiguration(getCommandsConfigFile());
+         commandsConfiguration.options().copyDefaults(true);
+-        commandsConfiguration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("configurations/commands.yml"), Charsets.UTF_8)));
++        commandsConfiguration.setDefaults(YamlConfiguration.loadConfiguration(
++            new InputStreamReader(getClass().getClassLoader().getResourceAsStream("configurations/commands.yml"), Charsets.UTF_8)));
+         saveCommandsConfig();
+ 
+         // Migrate aliases from old file and add previously implicit $1- to pass all arguments
+@@ -257,7 +297,8 @@ public final class CraftServer implements Server {
+         // Paper start
+         unrestrictedSignCommands = commandsConfiguration.getBoolean("unrestricted-signs");
+         if (unrestrictedSignCommands) {
+-            logger.warning("Warning: Commands are no longer restricted on signs. If you allow players to use Creative Mode, there may be risk of players bypassing permissions. Use this setting at your own risk!!!!");
++            logger.warning(
++                "Warning: Commands are no longer restricted on signs. If you allow players to use Creative Mode, there may be risk of players bypassing permissions. Use this setting at your own risk!!!!");
+         }
+         // Paper end
+         pluginManager.useTimings(configuration.getBoolean("settings.plugin-profiling"));
+@@ -277,7 +318,9 @@ public final class CraftServer implements Server {
+             listener = ((CommandListenerWrapper) listener).base;
+         }
+ 
+-        if (unrestrictedSignCommands && listener instanceof TileEntitySign.ISignCommandListener) return true; // Paper
++        if (unrestrictedSignCommands && listener instanceof TileEntitySign.ISignCommandListener) {
++            return true; // Paper
++        }
+         return unrestrictedAdvancements && listener instanceof AdvancementRewards.AdvancementCommandListener;
+     }
+ 
+@@ -322,7 +365,8 @@ public final class CraftServer implements Server {
+                     plugin.getLogger().info(message);
+                     plugin.onLoad();
+                 } catch (Throwable ex) {
+-                    Logger.getLogger(CraftServer.class.getName()).log(Level.SEVERE, ex.getMessage() + " initializing " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
++                    Logger.getLogger(CraftServer.class.getName()).log(Level.SEVERE,
++                        ex.getMessage() + " initializing " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+                 }
+             }
+         } else {
+@@ -334,7 +378,9 @@ public final class CraftServer implements Server {
+         if (type == PluginLoadOrder.STARTUP) {
+             helpMap.clear();
+             helpMap.initializeGeneralTopics();
+-            if (com.destroystokyo.paper.PaperConfig.loadPermsBeforePlugins) loadCustomPermissions(); // Paper
++            if (com.destroystokyo.paper.PaperConfig.loadPermsBeforePlugins) {
++                loadCustomPermissions(); // Paper
++            }
+         }
+ 
+         Plugin[] plugins = pluginManager.getPlugins();
+@@ -352,7 +398,9 @@ public final class CraftServer implements Server {
+             setVanillaCommands(false);
+             // Spigot end
+             commandMap.registerServerAliases();
+-            if (!com.destroystokyo.paper.PaperConfig.loadPermsBeforePlugins) loadCustomPermissions(); // Paper
++            if (!com.destroystokyo.paper.PaperConfig.loadPermsBeforePlugins) {
++                loadCustomPermissions(); // Paper
++            }
+             DefaultPermissions.registerCorePermissions();
+             CraftDefaultPermissions.registerCorePermissions();
+             helpMap.initializeCommands();
+@@ -368,7 +416,7 @@ public final class CraftServer implements Server {
+         for (ICommand cmd : commands.values()) {
+             // Spigot start
+             VanillaCommandWrapper wrapper = new VanillaCommandWrapper((CommandAbstract) cmd, LocaleI18n.get(cmd.getUsage(null)));
+-            if (org.spigotmc.SpigotConfig.replaceCommands.contains( wrapper.getName() ) ) {
++            if (org.spigotmc.SpigotConfig.replaceCommands.contains(wrapper.getName())) {
+                 if (first) {
+                     commandMap.register("minecraft", wrapper);
+                 }
+@@ -387,14 +435,17 @@ public final class CraftServer implements Server {
+                 try {
+                     pluginManager.addPermission(perm, false);
+                 } catch (IllegalArgumentException ex) {
+-                    getLogger().log(Level.WARNING, "Plugin " + plugin.getDescription().getFullName() + " tried to register permission '" + perm.getName() + "' but it's already registered", ex);
++                    getLogger().log(Level.WARNING,
++                        "Plugin " + plugin.getDescription().getFullName() + " tried to register permission '" + perm.getName()
++                            + "' but it's already registered", ex);
+                 }
+             }
+             pluginManager.dirtyPermissibles();
+ 
+             pluginManager.enablePlugin(plugin);
+         } catch (Throwable ex) {
+-            Logger.getLogger(CraftServer.class.getName()).log(Level.SEVERE, ex.getMessage() + " loading " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
++            Logger.getLogger(CraftServer.class.getName())
++                .log(Level.SEVERE, ex.getMessage() + " loading " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+         }
+     }
+ 
+@@ -438,7 +489,7 @@ public final class CraftServer implements Server {
+                     found = player;
+                     delta = curDelta;
+                 }
+-                if (curDelta == 0) break;
++                if (curDelta == 0) { break; }
+             }
+         }
+         return found;
+@@ -636,7 +687,7 @@ public final class CraftServer implements Server {
+     // NOTE: Should only be called from DedicatedServer.ah()
+     public boolean dispatchServerCommand(CommandSender sender, ServerCommand serverCommand) {
+         if (sender instanceof Conversable) {
+-            Conversable conversable = (Conversable)sender;
++            Conversable conversable = (Conversable) sender;
+ 
+             if (conversable.isConversing()) {
+                 conversable.acceptConversationInput(serverCommand.command);
+@@ -664,7 +715,9 @@ public final class CraftServer implements Server {
+             final CommandSender fSender = sender;
+             final String fCommandLine = commandLine;
+             Bukkit.getLogger().log(Level.SEVERE, "Command Dispatched Async: " + commandLine);
+-            Bukkit.getLogger().log(Level.SEVERE, "Please notify author of plugin causing this execution to fix this bug! see: http://bit.ly/1oSiM6C", new Throwable());
++            Bukkit.getLogger()
++                .log(Level.SEVERE, "Please notify author of plugin causing this execution to fix this bug! see: http://bit.ly/1oSiM6C",
++                    new Throwable());
+             org.bukkit.craftbukkit.util.Waitable<Boolean> wait = new org.bukkit.craftbukkit.util.Waitable<Boolean>() {
+                 @Override
+                 protected Boolean evaluate() {
+@@ -825,7 +878,7 @@ public final class CraftServer implements Server {
+         }
+     }
+ 
+-    @SuppressWarnings({ "unchecked", "finally" })
++    @SuppressWarnings({"unchecked", "finally"})
+     private void loadCustomPermissions() {
+         File file = new File(configuration.getString("settings.permissions-file"));
+         FileInputStream stream;
+@@ -861,7 +914,8 @@ public final class CraftServer implements Server {
+             return;
+         }
+ 
+-        List<Permission> permsList = Permission.loadPermissions(perms, "Permission node '%s' in " + file + " is invalid", Permission.DEFAULT_PERMISSION);
++        List<Permission> permsList = Permission
++            .loadPermissions(perms, "Permission node '%s' in " + file + " is invalid", Permission.DEFAULT_PERMISSION);
+ 
+         for (Permission perm : permsList) {
+             try {
+@@ -874,7 +928,8 @@ public final class CraftServer implements Server {
+ 
+     @Override
+     public String toString() {
+-        return "CraftServer{" + "serverName=" + serverName + ",serverVersion=" + serverVersion + ",minecraftVersion=" + console.getVersion() + '}';
++        return "CraftServer{" + "serverName=" + serverName + ",serverVersion=" + serverVersion + ",minecraftVersion=" + console.getVersion()
++            + '}';
+     }
+ 
+     public World createWorld(String name, World.Environment environment) {
+@@ -922,7 +977,8 @@ public final class CraftServer implements Server {
+             converter.convert(name, new IProgressUpdate() {
+                 private long b = System.currentTimeMillis();
+ 
+-                public void a(String s) {}
++                public void a(String s) {
++                }
+ 
+                 public void a(int i) {
+                     if (System.currentTimeMillis() - this.b >= 1000L) {
+@@ -932,7 +988,8 @@ public final class CraftServer implements Server {
+ 
+                 }
+ 
+-                public void c(String s) {}
++                public void c(String s) {
++                }
+             });
+         }
+ 
+@@ -946,19 +1003,22 @@ public final class CraftServer implements Server {
+                     break;
+                 }
+             }
+-        } while(used);
++        } while (used);
+         boolean hardcore = false;
+ 
+         IDataManager sdm = new ServerNBTManager(getWorldContainer(), name, true, getHandle().getServer().dataConverterManager);
+         WorldData worlddata = sdm.getWorldData();
+         WorldSettings worldSettings = null;
+         if (worlddata == null) {
+-            worldSettings = new WorldSettings(creator.seed(), EnumGamemode.getById(getDefaultGameMode().getValue()), generateStructures, hardcore, type);
++            worldSettings = new WorldSettings(creator.seed(), EnumGamemode.getById(getDefaultGameMode().getValue()), generateStructures,
++                hardcore, type);
+             worldSettings.setGeneratorSettings(creator.generatorSettings());
+             worlddata = new WorldData(worldSettings, name);
+         }
+-        worlddata.checkName(name); // CraftBukkit - Migration did not rewrite the level.dat; This forces 1.8 to take the last loaded world as respawn (in this case the end)
+-        WorldServer internal = (WorldServer) new WorldServer(console, sdm, worlddata, dimension, console.methodProfiler, creator.environment(), generator).b();
++        worlddata.checkName(
++            name); // CraftBukkit - Migration did not rewrite the level.dat; This forces 1.8 to take the last loaded world as respawn (in this case the end)
++        WorldServer internal = (WorldServer) new WorldServer(console, sdm, worlddata, dimension, console.methodProfiler,
++            creator.environment(), generator).b();
+ 
+         if (!(worlds.containsKey(name.toLowerCase(java.util.Locale.ENGLISH)))) {
+             return null;
+@@ -1056,7 +1116,7 @@ public final class CraftServer implements Server {
+         synchronized (RegionFileCache.class) {
+             // RegionFileCache.a should be RegionFileCache.cache
+             Iterator<Map.Entry<File, RegionFile>> i = RegionFileCache.a.entrySet().iterator();
+-            while(i.hasNext()) {
++            while (i.hasNext()) {
+                 Map.Entry<File, RegionFile> entry = i.next();
+                 File child = entry.getKey().getAbsoluteFile();
+                 while (child != null) {
+@@ -1101,7 +1161,9 @@ public final class CraftServer implements Server {
+     public void addWorld(World world) {
+         // Check if a World already exists with the UID.
+         if (getWorld(world.getUID()) != null) {
+-            System.out.println("World " + world.getName() + " is a duplicate of another world and has been prevented from loading. Please delete the uid.dat file from " + world.getName() + "'s world directory if you want to be able to load the duplicate world.");
++            System.out.println("World " + world.getName()
++                + " is a duplicate of another world and has been prevented from loading. Please delete the uid.dat file from " + world
++                .getName() + "'s world directory if you want to be able to load the duplicate world.");
+             return;
+         }
+         worlds.put(world.getName().toLowerCase(java.util.Locale.ENGLISH), world);
+@@ -1276,17 +1338,24 @@ public final class CraftServer implements Server {
+                     Plugin plugin = pluginManager.getPlugin(split[0]);
+ 
+                     if (plugin == null) {
+-                        getLogger().severe("Could not set generator for default world '" + world + "': Plugin '" + split[0] + "' does not exist");
++                        getLogger()
++                            .severe("Could not set generator for default world '" + world + "': Plugin '" + split[0] + "' does not exist");
+                     } else if (!plugin.isEnabled()) {
+-                        getLogger().severe("Could not set generator for default world '" + world + "': Plugin '" + plugin.getDescription().getFullName() + "' is not enabled yet (is it load:STARTUP?)");
++                        getLogger().severe(
++                            "Could not set generator for default world '" + world + "': Plugin '" + plugin.getDescription().getFullName()
++                                + "' is not enabled yet (is it load:STARTUP?)");
+                     } else {
+                         try {
+                             result = plugin.getDefaultWorldGenerator(world, id);
+                             if (result == null) {
+-                                getLogger().severe("Could not set generator for default world '" + world + "': Plugin '" + plugin.getDescription().getFullName() + "' lacks a default world generator");
++                                getLogger().severe(
++                                    "Could not set generator for default world '" + world + "': Plugin '" + plugin.getDescription()
++                                        .getFullName() + "' lacks a default world generator");
+                             }
+                         } catch (Throwable t) {
+-                            plugin.getLogger().log(Level.SEVERE, "Could not set generator for default world '" + world + "': Plugin '" + plugin.getDescription().getFullName(), t);
++                            plugin.getLogger().log(Level.SEVERE,
++                                "Could not set generator for default world '" + world + "': Plugin '" + plugin.getDescription()
++                                    .getFullName(), t);
+                         }
+                     }
+                 }
+@@ -1356,8 +1425,8 @@ public final class CraftServer implements Server {
+         GameProfile profile;
+         // Only fetch an online UUID in online mode
+         if (MinecraftServer.getServer().getOnlineMode()
+-                || (org.spigotmc.SpigotConfig.bungee && com.destroystokyo.paper.PaperConfig.bungeeOnlineMode)) {
+-            profile = console.getUserCache().getProfile( name );
++            || (org.spigotmc.SpigotConfig.bungee && com.destroystokyo.paper.PaperConfig.bungeeOnlineMode)) {
++            profile = console.getUserCache().getProfile(name);
+         } else {
+             // Make an OfflinePlayer using an offline mode UUID since the name has no profile
+             profile = new GameProfile(UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8)), name);
+@@ -1370,22 +1439,24 @@ public final class CraftServer implements Server {
+     @Deprecated
+     public OfflinePlayer getOfflinePlayer(String name) {
+         Validate.notNull(name, "Name cannot be null");
+-        com.google.common.base.Preconditions.checkArgument( !org.apache.commons.lang.StringUtils.isBlank( name ), "Name cannot be blank" ); // Spigot
++        com.google.common.base.Preconditions
++            .checkArgument(!org.apache.commons.lang.StringUtils.isBlank(name), "Name cannot be blank"); // Spigot
+ 
+         OfflinePlayer result = getPlayerExact(name);
+         if (result == null) {
+             // Spigot Start
+             GameProfile profile = null;
+             // Only fetch an online UUID in online mode
+-            if ( MinecraftServer.getServer().getOnlineMode()
+-                    || (org.spigotmc.SpigotConfig.bungee && com.destroystokyo.paper.PaperConfig.bungeeOnlineMode)) // Paper - Handle via setting
++            if (MinecraftServer.getServer().getOnlineMode()
++                || (org.spigotmc.SpigotConfig.bungee && com.destroystokyo.paper.PaperConfig.bungeeOnlineMode)) // Paper - Handle via setting
+             {
+-                profile = console.getUserCache().getProfile( name );
++                profile = console.getUserCache().getProfile(name);
+             }
+             // Spigot end
+             if (profile == null) {
+                 // Make an OfflinePlayer using an offline mode UUID since the name has no profile
+-                result = getOfflinePlayer(new GameProfile(UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8)), name));
++                result = getOfflinePlayer(
++                    new GameProfile(UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8)), name));
+             } else {
+                 // Use the GameProfile even when we get a UUID so we ensure we still have a name
+                 result = getOfflinePlayer(profile);
+@@ -1447,7 +1518,7 @@ public final class CraftServer implements Server {
+ 
+         for (JsonListEntry entry : playerList.getProfileBans().getValues()) {
+             result.add(getOfflinePlayer((GameProfile) entry.getKey()));
+-        }        
++        }
+ 
+         return result;
+     }
+@@ -1456,12 +1527,12 @@ public final class CraftServer implements Server {
+     public BanList getBanList(BanList.Type type) {
+         Validate.notNull(type, "Type cannot be null");
+ 
+-        switch(type){
+-        case IP:
+-            return new CraftIpBanList(playerList.getIPBans());
+-        case NAME:
+-        default:
+-            return new CraftProfileBanList(playerList.getProfileBans());
++        switch (type) {
++            case IP:
++                return new CraftIpBanList(playerList.getIPBans());
++            case NAME:
++            default:
++                return new CraftProfileBanList(playerList.getProfileBans());
+         }
+     }
+ 
+@@ -1671,8 +1742,9 @@ public final class CraftServer implements Server {
+         } else {
+             offers = tabCompleteChat(player, message);
+         }
+-        
+-        TabCompleteEvent tabEvent = new TabCompleteEvent(player, message, offers, message.startsWith("/") || forceCommand, pos != null ? MCUtil.toLocation(((CraftWorld) player.getWorld()).getHandle(), pos) : null); // Paper
++
++        TabCompleteEvent tabEvent = new TabCompleteEvent(player, message, offers, message.startsWith("/") || forceCommand,
++            pos != null ? MCUtil.toLocation(((CraftWorld) player.getWorld()).getHandle(), pos) : null); // Paper
+         getPluginManager().callEvent(tabEvent);
+ 
+         return tabEvent.isCancelled() ? Collections.EMPTY_LIST : tabEvent.getCompletions();
+@@ -1680,8 +1752,8 @@ public final class CraftServer implements Server {
+ 
+     public List<String> tabCompleteCommand(Player player, String message, BlockPosition pos) {
+         // Spigot Start
+-		if ( (org.spigotmc.SpigotConfig.tabComplete < 0 || message.length() <= org.spigotmc.SpigotConfig.tabComplete) && !message.contains( " " ) )
+-        {
++        if ((org.spigotmc.SpigotConfig.tabComplete < 0 || message.length() <= org.spigotmc.SpigotConfig.tabComplete) && !message
++            .contains(" ")) {
+             return ImmutableList.of();
+         }
+         // Spigot End
+@@ -1695,7 +1767,8 @@ public final class CraftServer implements Server {
+             if (pos == null) {
+                 completions = getCommandMap().tabComplete(player, message);
+             } else {
+-                completions = getCommandMap().tabComplete(player, message, new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ()));
++                completions = getCommandMap()
++                    .tabComplete(player, message, new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ()));
+             }
+         } catch (CommandException ex) {
+             player.sendMessage(ChatColor.RED + "An internal error occurred while attempting to tab-complete this command");
+@@ -1743,7 +1816,9 @@ public final class CraftServer implements Server {
+             return;
+         }
+         this.printSaveWarning = true;
+-        getLogger().log(Level.WARNING, "A manual (plugin-induced) save has been detected while server is configured to auto-save. This may affect performance.", warningState == WarningState.ON ? new Throwable() : null);
++        getLogger().log(Level.WARNING,
++            "A manual (plugin-induced) save has been detected while server is configured to auto-save. This may affect performance.",
++            warningState == WarningState.ON ? new Throwable() : null);
+     }
+ 
+     @Override
+@@ -1818,12 +1893,13 @@ public final class CraftServer implements Server {
+ 
+     @Override
+     public Iterator<org.bukkit.advancement.Advancement> advancementIterator() {
+-        return Iterators.unmodifiableIterator(Iterators.transform(console.getAdvancementData().c().iterator(), new Function<Advancement, org.bukkit.advancement.Advancement>() { // PAIL: rename
+-            @Override
+-            public org.bukkit.advancement.Advancement apply(Advancement advancement) {
+-                return advancement.bukkit;
+-            }
+-        }));
++        return Iterators.unmodifiableIterator(Iterators.transform(console.getAdvancementData().c().iterator(),
++            new Function<Advancement, org.bukkit.advancement.Advancement>() { // PAIL: rename
++                @Override
++                public org.bukkit.advancement.Advancement apply(Advancement advancement) {
++                    return advancement.bukkit;
++                }
++            }));
+     }
+ 
+     @Deprecated
+@@ -1835,39 +1911,34 @@ public final class CraftServer implements Server {
+     // Paper - Add getTPS API - Further improve tick loop
+     @Override
+     public double[] getTPS() {
+-        return new double[] {
+-                MinecraftServer.getServer().tps1.getAverage(),
+-                MinecraftServer.getServer().tps5.getAverage(),
+-                MinecraftServer.getServer().tps15.getAverage()
++        return new double[]{
++            MinecraftServer.getServer().tps1.getAverage(),
++            MinecraftServer.getServer().tps5.getAverage(),
++            MinecraftServer.getServer().tps15.getAverage()
+         };
+     }
+     // Paper end
+ 
+-    private final Spigot spigot = new Spigot()
+-    {
++    private final Spigot spigot = new Spigot() {
+ 
+         @Deprecated
+         @Override
+-        public YamlConfiguration getConfig()
+-        {
++        public YamlConfiguration getConfig() {
+             return org.spigotmc.SpigotConfig.config;
+         }
+ 
+         @Override
+-        public YamlConfiguration getBukkitConfig()
+-        {
++        public YamlConfiguration getBukkitConfig() {
+             return configuration;
+         }
+ 
+         @Override
+-        public YamlConfiguration getSpigotConfig()
+-        {
++        public YamlConfiguration getSpigotConfig() {
+             return org.spigotmc.SpigotConfig.config;
+         }
+ 
+         @Override
+-        public YamlConfiguration getPaperConfig()
+-        {
++        public YamlConfiguration getPaperConfig() {
+             return com.destroystokyo.paper.PaperConfig.config;
+         }
+ 
+@@ -1891,8 +1962,7 @@ public final class CraftServer implements Server {
+         }
+     };
+ 
+-    public Spigot spigot()
+-    {
++    public Spigot spigot() {
+         return spigot;
+     }
+ 
+@@ -1906,7 +1976,8 @@ public final class CraftServer implements Server {
+ 
+             Class clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
+             javax.management.MBeanServer server = java.lang.management.ManagementFactory.getPlatformMBeanServer();
+-            Object hotspotMBean = java.lang.management.ManagementFactory.newPlatformMXBeanProxy(server, "com.sun.management:type=HotSpotDiagnostic", clazz);
++            Object hotspotMBean = java.lang.management.ManagementFactory
++                .newPlatformMXBeanProxy(server, "com.sun.management:type=HotSpotDiagnostic", clazz);
+             java.lang.reflect.Method m = clazz.getMethod("dumpHeap", String.class, boolean.class);
+             m.invoke(hotspotMBean, file.getPath(), true);
+             return true;
+@@ -1926,7 +1997,9 @@ public final class CraftServer implements Server {
+                 try {
+                     pluginManager.addPermission(perm);
+                 } catch (IllegalArgumentException ex) {
+-                    getLogger().log(Level.WARNING, "Plugin " + plugin.getDescription().getFullName() + " tried to register permission '" + perm.getName() + "' but it's already registered", ex);
++                    getLogger().log(Level.WARNING,
++                        "Plugin " + plugin.getDescription().getFullName() + " tried to register permission '" + perm.getName()
++                            + "' but it's already registered", ex);
+                 }
+             });
+         }
+@@ -1935,8 +2008,8 @@ public final class CraftServer implements Server {
+     @Override
+     public boolean reloadCommandAliases() {
+         Set<String> removals = getCommandAliases().keySet().stream()
+-                .map(key -> key.toLowerCase(java.util.Locale.ENGLISH))
+-                .collect(java.util.stream.Collectors.toSet());
++            .map(key -> key.toLowerCase(java.util.Locale.ENGLISH))
++            .collect(java.util.stream.Collectors.toSet());
+         getCommandMap().getKnownCommands().keySet().removeIf(removals::contains);
+         File file = getCommandsConfigFile();
+         try {
+@@ -1967,7 +2040,7 @@ public final class CraftServer implements Server {
+     public com.destroystokyo.paper.profile.PlayerProfile createProfile(@Nullable UUID uuid, @Nullable String name) {
+         Player player = uuid != null ? Bukkit.getPlayer(uuid) : (name != null ? Bukkit.getPlayerExact(name) : null);
+         if (player != null) {
+-            return new com.destroystokyo.paper.profile.CraftPlayerProfile((CraftPlayer)player);
++            return new com.destroystokyo.paper.profile.CraftPlayerProfile((CraftPlayer) player);
+         }
+         return new com.destroystokyo.paper.profile.CraftPlayerProfile(uuid, name);
+     }
+-- 
+2.7.4
+

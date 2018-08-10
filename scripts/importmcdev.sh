@@ -23,9 +23,14 @@ function import {
         export MODLOG="$MODLOG  Imported $file from mc-dev\n";
         echo "Copying $base to $target"
         cp "$base" "$target"
-    else
-        echo "UN-NEEDED IMPORT: $file"
     fi
+}
+
+function importAll {
+	echo "Importing ALL files from mc-dev..."
+	export MODLOG="$MODLOG  Imported ALL files from mc-dev\n";
+    cp -nrv $decompiledir/$nms/* $basedir/Paper/Paper-Server/src/main/java/$nms/
+	echo "Import complete."
 }
 
 (
@@ -36,7 +41,8 @@ function import {
     fi
 )
 
-# import ClassNameHere
+# Scissors - import all classes
+importAll
 
 cd "Paper/Paper-Server/"
 rm -rf nms-patches applyPatches.sh makePatches.sh >/dev/null 2>&1
