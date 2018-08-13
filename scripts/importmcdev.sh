@@ -42,7 +42,7 @@ function importAll {
 )
 
 # Scissors - import all classes
-importAll
+# importAll
 
 cd "Paper/Paper-Server/"
 rm -rf nms-patches applyPatches.sh makePatches.sh >/dev/null 2>&1

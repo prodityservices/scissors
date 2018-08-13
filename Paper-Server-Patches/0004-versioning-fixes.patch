@@ -1,0 +1,61 @@
+From 7a48017806104a45a1741088e3d3d430cf586760 Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Mon, 13 Aug 2018 09:48:00 -0400
+Subject: [PATCH] versioning fixes
+
+
+diff --git a/pom.xml b/pom.xml
+index f42cdd1..978409c 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -201,7 +201,7 @@
+                 <artifactId>gitdescribe-maven-plugin</artifactId>
+                 <version>1.3</version>
+                 <configuration>
+-                    <outputPrefix>git-Scissors-</outputPrefix>
++                    <outputPrefix>git-Scissors-</outputPrefix> <!-- Scissors - "git-PaperSpigot"->"git-Scissors-" -->
+                     <scmDirectory>..</scmDirectory>
+                 </configuration>
+                 <executions>
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 80702f6..7fa1b71 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -140,7 +140,7 @@ import javax.annotation.Nonnull; // Paper
+ 
+ 
+ public final class CraftServer implements Server {
+-    private final String serverName = "Paper";
++    private final String serverName = "Scissors"; // Scissors - "Paper"->"Scissors"
+     private final String serverVersion;
+     private final String bukkitVersion = Versioning.getBukkitVersion();
+     private final Logger logger = Logger.getLogger("Minecraft");
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+index 674096c..196be52 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+@@ -11,7 +11,7 @@ public final class Versioning {
+     public static String getBukkitVersion() {
+         String result = "Unknown-Version";
+ 
+-        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/com.destroystokyo.paper/paper-api/pom.properties");
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/io.prodity.scissors/scissors-api/pom.properties");
+         Properties properties = new Properties();
+ 
+         if (stream != null) {
+diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
+index 57a4748..516e361 100644
+--- a/src/main/java/org/spigotmc/WatchdogThread.java
++++ b/src/main/java/org/spigotmc/WatchdogThread.java
+@@ -58,7 +58,7 @@ public class WatchdogThread extends Thread
+                 log.log( Level.SEVERE, "The server has stopped responding!" );
+                 log.log( Level.SEVERE, "Please report this to https://github.com/PaperMC/Paper/issues" );
+                 log.log( Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports" );
+-                log.log( Level.SEVERE, "Paper version: " + Bukkit.getServer().getVersion() );
++                log.log( Level.SEVERE, "Scissors version: " + Bukkit.getServer().getVersion() );
+                 //
+                 if(net.minecraft.server.World.haveWeSilencedAPhysicsCrash)
+                 {
+-- 
+2.7.4
+

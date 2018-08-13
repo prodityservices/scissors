@@ -1,0 +1,55 @@
+From b4c05b2a4f0c862bb6c7bf17c5ad0472961a8fd4 Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Mon, 13 Aug 2018 09:44:27 -0400
+Subject: [PATCH] versioning fixes
+
+
+diff --git a/src/main/java/co/aikar/timings/TimingsManager.java b/src/main/java/co/aikar/timings/TimingsManager.java
+index 58ed35e..ae60c15 100644
+--- a/src/main/java/co/aikar/timings/TimingsManager.java
++++ b/src/main/java/co/aikar/timings/TimingsManager.java
+@@ -160,7 +160,8 @@ public final class TimingsManager {
+         final Server server = Bukkit.getServer();
+         if (!(  server == null || pluginName == null ||
+                 "minecraft".equals(pluginName) || "bukkit".equals(pluginName) ||
+-                "spigot".equalsIgnoreCase(pluginName) || "paper".equals(pluginName)
++                "spigot".equalsIgnoreCase(pluginName) || "paper".equals(pluginName) ||
++                "scissors".equalsIgnoreCase(pluginName)
+         )) {
+             plugin = server.getPluginManager().getPlugin(pluginName);
+         }
+diff --git a/src/main/java/org/bukkit/command/defaults/VersionCommand.java b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
+index c45faf4..70841c5 100644
+--- a/src/main/java/org/bukkit/command/defaults/VersionCommand.java
++++ b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
+@@ -209,7 +209,26 @@ public class VersionCommand extends BukkitCommand {
+     private void obtainVersion() {
+         String version = Bukkit.getVersion();
+         if (version == null) version = "Custom";
+-        if (version.startsWith("git-Paper-")) {
++        // Scissors start
++        if (version.startsWith("git-Scissors-")) {
++            setVersionMessage("Scissors version information currently disabled");
++//            String[] parts = version.substring("git-Paper-".length()).split("[-\\s]");
++//            int distance = getDistance(null, parts[0]);
++//            switch (distance) {
++//                case -1:
++//                    setVersionMessage("Error obtaining version information");
++//                    break;
++//                case 0:
++//                    setVersionMessage("You are running the latest version");
++//                    break;
++//                case -2:
++//                    setVersionMessage("Unknown version");
++//                    break;
++//                default:
++//                    setVersionMessage("You are " + distance + " version(s) behind");
++//            }
++        } else if (version.startsWith("git-Paper-")) {
++            // Scissors end
+             String[] parts = version.substring("git-Paper-".length()).split("[-\\s]");
+             int distance = getDistance(null, parts[0]);
+             switch (distance) {
+-- 
+2.7.4
+
