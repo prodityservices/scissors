@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git submodule update --init --recursive && ./remap.sh && ./decompile.sh && ./init.sh && ./applyPatches.sh && mvn clean install
+git submodule update --init --recursive && ./scripts/remap.sh && ./scripts/decompile.sh && ./scripts/init.sh && ./scripts/applyPatches.sh && mvn clean install
 
 echo " Deleting existing scissors.jar (if present)..."
 rm -rf ./scissors.jar
