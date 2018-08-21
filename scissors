@@ -25,8 +25,6 @@ SOURCE=$([[ "$SOURCE" = /* ]] && echo "$SOURCE" || echo "$PWD/${SOURCE#./}")
 basedir=$(dirname "$SOURCE")
 gitcmd="git -c commit.gpgsign=false"
 
-source "$basedir/scripts/functions.sh"
-
 case "$1" in
     "rb" | "rbp" | "rebuild")
     (
@@ -66,6 +64,7 @@ case "$1" in
         echo "Cleaned build files."
     ;;
     *)
+		echo " "
         echo "Scissors build tool command. This provides a variety of commands to build and manage the Scissors build"
         echo "environment. For all of the functionality of this command to be available, you must first run the"
         echo "'setup' command. View below for details. For essential building and patching, you do not need to do the setup."
@@ -80,6 +79,7 @@ case "$1" in
         echo "  * a. api            | Move to the Scissors-API directory."
         echo "  * s, server         | Move to the Scissors-Server directory."
         echo "  * c, clean          | Cleans the build directories"
+		echo " "
     ;;
 esac
 
