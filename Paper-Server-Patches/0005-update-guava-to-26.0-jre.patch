@@ -1,0 +1,22 @@
+From 41a3c49e95b28c9884401725d498d82d3e9f663d Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Mon, 13 Aug 2018 10:41:59 -0400
+Subject: [PATCH] update guava to 26.0-jre
+
+
+diff --git a/pom.xml b/pom.xml
+index 978409c..44e7c77 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -82,7 +82,7 @@
+         <dependency>
+             <groupId>com.google.guava</groupId>
+             <artifactId>guava</artifactId>
+-            <version>25.1-jre</version>
++            <version>26.0-jre</version>
+             <scope>compile</scope>
+         </dependency>
+ 
+-- 
+2.7.4
+

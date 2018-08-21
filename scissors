@@ -25,8 +25,6 @@ SOURCE=$([[ "$SOURCE" = /* ]] && echo "$SOURCE" || echo "$PWD/${SOURCE#./}")
 basedir=$(dirname "$SOURCE")
 gitcmd="git -c commit.gpgsign=false"
 
-source "$basedir/scripts/functions.sh"
-
 case "$1" in
     "rb" | "rbp" | "rebuild")
     (
@@ -58,23 +56,6 @@ case "$1" in
         fi
     )
     ;;
-    "m" | "mcdev")
-    (
-        set -e
-        cd "$basedir"
-        scripts/makemcdevsrc.sh "$basedir"
-    )
-    ;;
-    "t" | "test" | "testserver")
-    (
-        cd "$basedir"
-        shift
-        scripts/testServer.sh "$basedir" "$@"
-    )
-    ;;
-    "td" | "testdir")
-        cd "${S_TEST_DIR:-$basedir/Paper/work/test-server}"
-    ;;
     "u" | "up" | "upstream")
     (
         cd "$basedir"
@@ -91,69 +72,15 @@ case "$1" in
         cd "$basedir/Scissors-Server"
     ;;
     "c" | "clean")
+        echo "Cleaning build files..."
         rm -rf Scissors-API
         rm -rf Scissors-Server
 		rm -rf Paper
         rm -rf work
-        echo "Cleaned build files"
-    ;;
-    "e" | "edit")
-        case "$2" in
-            "s" | "server")
-            export LAST_EDIT="$basedir/Scissors-Server"
-            cd "$basedir/Scissors-Server"
-            (
-                set -e
-
-                scissorsstash
-                $gitcmd rebase -i upstream/upstream
-                scissorsunstash
-            )
-            ;;
-            "a" | "api")
-            export LAST_EDIT="$basedir/Scissors-API"
-            cd "$basedir/Scissors-API"
-            (
-                set -e
-
-                scissorsstash
-                $gitcmd rebase -i upstream/upstream
-                scissorsunstash
-            )
-            ;;
-            "c" | "continue")
-            cd "$LAST_EDIT"
-            unset LAST_EDIT
-            (
-                set -e
-
-                $gitcmd add .
-                $gitcmd commit --amend
-                $gitcmd rebase --continue
-
-                cd "$basedir"
-                scripts/rebuildPatches.sh "$basedir"
-            )
-            ;;
-            *)
-                echo "You must edit either the api or server."
-            ;;
-        esac
-    ;;
-    "setup")
-        if [[ -f "$RCPATH" ]] ; then
-            NAME="scissors"
-            if [[ ! -z "${2+x}" ]] ; then
-                NAME="$2"
-            fi
-            (grep "alias $NAME=" "$RCPATH" > /dev/null) && (sed -i "s|alias $NAME=.*|alias $NAME='. $SOURCE'|g" "$RCPATH") || (echo "alias $NAME='. $SOURCE'" >> "$RCPATH")
-            alias "$NAME=. $SOURCE"
-            echo "You can now just type '$NAME' at any time to access the scissors tool."
-        else
-          echo "We were unable to setup the scissors build tool alias: $RCPATH is missing"
-        fi
+        echo "Cleaned build files."
     ;;
     *)
+        echo " "
         echo "Scissors build tool command. This provides a variety of commands to build and manage the Scissors build"
         echo "environment. For all of the functionality of this command to be available, you must first run the"
         echo "'setup' command. View below for details. For essential building and patching, you do not need to do the setup."
@@ -162,33 +89,17 @@ case "$1" in
         echo "  * rb, rebuild       | Rebuild patches, can be called from anywhere."
         echo "  * p, patch          | Apply all patches to the project without building it. Can be run from anywhere."
         echo "  * j, jar            | Apply all patches and build the project, scissors.jar will be output. Can be run from anywhere."
-        echo "  * m, mcdev          | Setup decompiled sources for non-modified NMS files to be imported into an IDE. Can be run from anywhere."
         echo "  * u, up, upstream   | Updates the submodules used by Scissors to their latest upstream versions."
-        echo "  * t, testserver     | Run the test server with the set of plugins Scissors uses as a basis for server tests."
         echo ""
         echo " These commands require the setup command before use:"
         echo "  * r, root           | Change directory to the root of the project."
         echo "  * a. api            | Move to the Scissors-API directory."
         echo "  * s, server         | Move to the Scissors-Server directory."
-        echo "  * td, testdirectory | Move to the test-server directory."
-        echo "  * e, edit           | Use to edit a specific patch, give it the argument \"server\" or \"api\""
-        echo "                      | respectively to edit the correct project. Use the argument \"continue\" after"
-        echo "                      | the changes have been made to finish and rebuild patches. Can be called from anywhere."
-        echo ""
-        echo "  * setup             | Add an alias to $RCPATH to allow full functionality of this script. Run as:"
-        echo "                      |     . ./scissors setup"
-        echo "                      | After you run this command you'll be able to just run 'scissors' from anywhere."
-        echo "                      | The default name for the resulting alias is 'scissors', you can give an argument to override"
-        echo "                      | this default, such as:"
-        echo "                      |     . ./scissors setup example"
-        echo "                      | Which will allow you to run 'example' instead."
+        echo "  * c, clean          | Deletes all build files and directories."
+        echo " "
     ;;
 esac
 
 unset RCPATH
 unset SOURCE
 unset basedir
-unset -f color
-unset -f colorend
-unset -f scissorsstash
-unset -f scissorsunstash

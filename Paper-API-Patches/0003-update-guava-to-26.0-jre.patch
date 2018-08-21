@@ -1,0 +1,22 @@
+From 9ad204884a45602469185a57bc9d8cc7242e7cd4 Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Mon, 13 Aug 2018 10:42:09 -0400
+Subject: [PATCH] update guava to 26.0-jre
+
+
+diff --git a/pom.xml b/pom.xml
+index d8962d4..b3c6540 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -99,7 +99,7 @@
+         <dependency>
+             <groupId>com.google.guava</groupId>
+             <artifactId>guava</artifactId>
+-            <version>21.0</version>
++            <version>26.0-jre</version>
+             <scope>compile</scope>
+         </dependency>
+         <!-- bundled with Minecraft, should be kept in sync -->
+-- 
+2.7.4
+
