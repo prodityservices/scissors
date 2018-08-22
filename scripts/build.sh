@@ -1,12 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-git submodule update --init --recursive && ./scripts/remap.sh && ./scripts/decompile.sh && ./scripts/init.sh && ./scripts/applyPatches.sh && mvn clean install
+(
+set -e
 
-echo " Deleting existing scissors.jar (if present)..."
 rm -rf ./scissors.jar
 
-echo " Copying new scissors.jar to root directory..."
-cp ./Scissors-Server/target/scissors*-SNAPSHOT.jar ./scissors.jar
+(git submodule update --init --recursive && ./scripts/remap.sh && ./scripts/decompile.sh && ./scripts/init.sh && ./scripts/applyPatches.sh) || (
+    echo "Failed to build Scissors"
+    exit 1
+) || exit 1
+if [ "$2" == "--jar" ]; then
+    echo " "
+    echo " Compiling and installing scissors jar..."
+    echo " "
+    mvn clean install
+	cp ./Scissors-Server/target/scissors*-SNAPSHOT.jar ./scissors.jar
+fi
+)
 
 echo " "
 echo " Scissors build complete."
