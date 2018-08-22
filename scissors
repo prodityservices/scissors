@@ -47,15 +47,6 @@ case "$1" in
         scripts/build.sh "$basedir" "--jar"
     )
     ;;
-    "make")
-    (
-        if [[ "$2" = "bacon" ]] ; then
-            set -e
-            cd "$basedir"
-            scripts/build.sh "$basedir" "--jar"
-        fi
-    )
-    ;;
     "u" | "up" | "upstream")
     (
         cd "$basedir"
