@@ -19,5 +19,5 @@ fi
 )
 
 echo " "
-echo " Scissors build complete."
+echo " Scissors build completed successfully."
 echo " "

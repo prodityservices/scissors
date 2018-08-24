@@ -21,4 +21,4 @@ update Paper
 echo "Updating submodules"
 $gitcmd submodule update --init --recursive
 # Scissors end
-)
+) || exit 1
