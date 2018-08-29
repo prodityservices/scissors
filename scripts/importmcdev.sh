@@ -39,7 +39,7 @@ function importAll {
     if [[ "$lastlog" = *"mc-dev Imports"* ]]; then
         $gitcmd reset --hard HEAD^
     fi
-)
+) || exit 1
 
 # Scissors imports
 import BlockState

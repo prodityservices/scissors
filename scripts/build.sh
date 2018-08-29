@@ -16,7 +16,7 @@ if [ "$2" == "--jar" ]; then
     mvn clean install
 	cp ./Scissors-Server/target/scissors*-SNAPSHOT.jar ./scissors.jar
 fi
-)
+) || exit 1
 
 echo " "
 echo " Scissors build completed successfully."
