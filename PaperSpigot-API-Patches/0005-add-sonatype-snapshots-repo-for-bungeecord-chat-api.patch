@@ -1,0 +1,27 @@
+From f60ae0bb8c650fd35d80aef53425438bf28de6a2 Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Thu, 30 Aug 2018 07:31:34 -0400
+Subject: [PATCH] add sonatype snapshots repo for bungeecord chat api
+
+
+diff --git a/pom.xml b/pom.xml
+index 4db8973..22ebe5a 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -39,6 +39,13 @@
+         </snapshotRepository>
+     </distributionManagement>
+ 
++    <repositories>
++        <repository>
++            <id>sonatype</id>
++            <url>https://oss.sonatype.org/content/groups/public/</url>
++        </repository>
++    </repositories>
++
+     <!-- required until fixed plexus-compiler-eclipse is deployed -->
+     <pluginRepositories>
+         <pluginRepository>
+-- 
+2.7.4
+
