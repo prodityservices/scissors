@@ -3,39 +3,117 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2
-jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
 
-    working_directory: ~/repo
+job_defaults: &job_defaults
+  working_directory: ~/build
+  docker:
+    - image: circleci/openjdk:8-jdk
+  environment:
+    _JAVA_OPTIONS: "-Xms2G -Xmx2G"
 
-    environment:
-      # Customize the JVM maximum heap limit
-      MAVEN_OPTS: -Xmx3200m
+save_cache: &save_cache
+  paths:
+    - ~/.m2  
     
+restore_cache: &restore_cache
+  keys:
+    - maven-build-{{ .Branch }}-{{ .Revision }}
+    - maven-persist-{{ .Branch }}-{{ checksum "pom.xml" }}-{{ checksum "Scissors-API/pom.xml" }}-{{ checksum "Scissors-Server/pom.xml" }}-{{ checksum ".circleci/config.yml" }}
+      
+jobs: 
+            
+  # patch sources prior to compiling
+  patch:
+    <<: *job_defaults
+      
     steps:
+    
       - checkout
+    
+      - run:
+          name: Patch Sources
+          command:  |
+            git config --global user.email "circleci@circleci.com"
+            git config --global user.name "CircleCI"
+            ./scissors patch
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "pom.xml" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      - run: mvn dependency:go-offline
-
-      - save_cache:
+      - run:
+          name: Clean Large Files
+          command: |
+            sleep 1
+            (
+              sudo rm -rf .git
+              sudo rm -rf Paper
+              sudo rm -rf Scissors-Server/.git
+              sudo rm -rf Scissors-API/.git
+            ) || (
+              echo "failed at removing git directories =/"
+            )
+       
+      - persist_to_workspace:
+          root: /home/circleci
           paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
-        
-      # run tests!
-      - run: mvn integration-test
+            - build
+      
+      - save_cache: 
+          <<: *save_cache
+          key: maven-persist-{{ .Branch }}-{{ checksum "pom.xml" }}-{{ checksum "Scissors-API/pom.xml" }}-{{ checksum "Scissors-Server/pom.xml" }}-{{ checksum ".circleci/config.yml" }}
+          
+  build:
+    <<: *job_defaults
+
+    steps:
+    
+      - checkout
+    
+      - attach_workspace:
+          at: /home/circleci
+          
+      - restore_cache:
+          <<: *restore_cache
+          
+      - run: mvn -B install
+       
+      - persist_to_workspace:
+          root: /home/circleci
+          paths:
+            - build
+      
+      - save_cache:
+          <<: *save_cache
+          key: maven-build-{{ .Branch }}-{{ .Revision }}
+
+  deploy:
+    <<: *job_defaults
+
+    steps:
+    
+      - checkout
+      
+      - attach_workspace:
+          at: /home/circleci
+          
+      - restore_cache:
+          <<: *restore_cache
+          
+      - run:
+          name: Copy Artifact
+          command: cp Scissors-Server/target/scissors*.jar scissors.jar
+          
+      - store_artifacts:
+          path: scissors.jar
+      
+      # TODO - maven deployment
+      #- run: mvn -B -s .circleci/settings.xml -DskipTests deploy    
+          
+workflows:
+  version: 2
+  patch_and_build:
+    jobs:
+      - patch
+      - build:
+          requires:
+            - patch
+      - deploy:
+          requires:
+            - build

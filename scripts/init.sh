@@ -38,4 +38,4 @@ done
 $gitcmd add src
 $gitcmd commit -m "CraftBukkit $ $(date)" --author="Auto <auto@mated.null>"
 $gitcmd checkout -f HEAD^
-)
+) || exit 1

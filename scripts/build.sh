@@ -17,12 +17,10 @@ if [ "$2" == "--jar" ]; then
     echo " Compiling and installing scissors jar..."
     echo " "
     mvn clean install
-	mcver=$(cat "$workdir/BuildData/info.json" | grep minecraftVersion | cut -d '"' -f 4)
-	scissorsjar="$basedir/Scissors-Server/target/scissors-$mcver.jar"
-	cp $scissorsjar $basedir/scissors.jar
+	cp ./Scissors-Server/target/scissors*-SNAPSHOT.jar ./scissors.jar
 fi
-)
+) || exit 1
 
 echo " "
-echo " Scissors build complete."
+echo " Scissors build completed successfully."
 echo " "

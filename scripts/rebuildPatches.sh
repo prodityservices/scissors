@@ -60,4 +60,4 @@ function savePatches {
 
 savePatches "$basedir/Paper/Paper-API" "Scissors-API"
 savePatches "$basedir/Paper/Paper-Server" "Scissors-Server"
-)
+) || exit 1

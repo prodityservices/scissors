@@ -122,4 +122,4 @@ echo "Importing Scissors MC Dev"
     exit 1
 ) || exit 1
 
-)
+) || exit 1

@@ -30,4 +30,4 @@ if [ ! -d "$decompiledir/net/minecraft/server" ]; then
         exit 1
     fi
 fi
-)
+) || exit 1

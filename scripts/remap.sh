@@ -44,7 +44,7 @@ fi
 
 echo "Applying class mappings..."
 if [ ! -f "$jarpath-cl.jar" ]; then
-    java -jar "$workdir/BuildData/bin/SpecialSource-2.jar" map -i "$jarpath.jar" -m "$classmappings" -o "$jarpath-cl.jar" 1>/dev/null
+    java -jar "$workdir/BuildData/bin/SpecialSource-2.jar" map -i "$jarpath.jar" -m "$classmappings" -o "$jarpath-cl.jar"
     if [ "$?" != "0" ]; then
         echo "Failed to apply class mappings."
         exit 1
@@ -76,4 +76,4 @@ if [ "$?" != "0" ]; then
     echo "Failed to install remapped jar."
     exit 1
 fi
-)
+) || exit 1

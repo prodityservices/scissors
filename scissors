@@ -25,33 +25,34 @@ SOURCE=$([[ "$SOURCE" = /* ]] && echo "$SOURCE" || echo "$PWD/${SOURCE#./}")
 basedir=$(dirname "$SOURCE")
 gitcmd="git -c commit.gpgsign=false"
 
+failed=0
 case "$1" in
     "rb" | "rbp" | "rebuild")
     (
         set -e
         cd "$basedir"
-        scripts/rebuildPatches.sh "$basedir"
-    )
+        scripts/rebuildPatches.sh "$basedir" || exit 1
+    ) || failed=1
     ;;
     "p" | "patch")
     (
         set -e
         cd "$basedir"
-        scripts/build.sh "$basedir"
-    )
+        scripts/build.sh "$basedir" || exit 1
+    ) || failed=1
     ;;
     "j" | "jar")
     (
         set -e
         cd "$basedir"
-        scripts/build.sh "$basedir" "--jar"
-    )
+        scripts/build.sh "$basedir" "--jar" || exit 1
+    ) || failed=1
     ;;
     "u" | "up" | "upstream")
     (
         cd "$basedir"
-        scripts/upstreamMerge.sh "$basedir" "$2"
-    )
+        scripts/upstreamMerge.sh "$basedir" "$2" || exit 1
+    ) || failed=1
     ;;
     "r" | "root")
         cd "$basedir"
@@ -94,3 +95,11 @@ esac
 unset RCPATH
 unset SOURCE
 unset basedir
+
+if [ "$failed" == "1" ]; then
+	unset failed
+	false
+else
+	unset failed
+	true
+fi 
