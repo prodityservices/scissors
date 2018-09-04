@@ -22,16 +22,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <distributionManagement>
+	<distributionManagement>
         <repository>
             <id>prodity-releases</id>
             <name>Prodity Releases</name>
-            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+            <url>https://repo.prodity.io/artifactory/prodity-releases/</url>
         </repository>
         <snapshotRepository>
             <id>prodity-snapshots</id>
             <name>Prodity Snapshots</name>
-            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
+            <url>https://repo.prodity.io/artifactory/prodity-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -48,13 +48,9 @@
             <id>destroystokyo-repo</id>
             <url>https://destroystokyo.com/repo/repository/maven-public/</url>
         </repository>
-        <repository>
-            <id>prodity-snapshots</id>
-            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
-        </repository>
-        <repository>
-            <id>prodity-releases</id>
-            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+		<repository>
+            <id>prodity-all</id>
+            <url>https://repo.prodity.io/artifactory/prodity-all/</url>
         </repository>
     </repositories>
 
