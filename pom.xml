@@ -25,12 +25,12 @@
         <repository>
             <id>prodity-releases</id>
             <name>Prodity Releases</name>
-            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+            <url>https://repo.prodity.io/artifactory/prodity-releases/</url>
         </repository>
         <snapshotRepository>
             <id>prodity-snapshots</id>
             <name>Prodity Snapshots</name>
-            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
+            <url>https://repo.prodity.io/artifactory/prodity-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -40,12 +40,8 @@
             <url>http://repo.md-5.net/content/repositories/releases/</url>
         </repository>
 		<repository>
-            <id>prodity-snapshots</id>
-            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
-        </repository>
-        <repository>
-            <id>prodity-releases</id>
-            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+            <id>prodity-all</id>
+            <url>https://repo.prodity.io/artifactory/prodity-all/</url>
         </repository>
     </repositories>
 

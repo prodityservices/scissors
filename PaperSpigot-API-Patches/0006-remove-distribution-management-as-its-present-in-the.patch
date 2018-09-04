@@ -1,0 +1,34 @@
+From ebcb75f071d885bdac30867bb70e34fbd63420fc Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Tue, 4 Sep 2018 12:59:51 -0400
+Subject: [PATCH] remove distribution management as its present in the parent
+ pom
+
+
+diff --git a/pom.xml b/pom.xml
+index 22ebe5a..eec8f91 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -26,19 +26,6 @@
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     </properties>
+ 
+-    <distributionManagement>
+-        <repository>
+-            <id>prodity-releases</id>
+-            <name>Prodity Releases</name>
+-            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+-        </repository>
+-        <snapshotRepository>
+-            <id>prodity-snapshots</id>
+-            <name>Prodity Snapshots</name>
+-            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
+-        </snapshotRepository>
+-    </distributionManagement>
+-
+     <repositories>
+         <repository>
+             <id>sonatype</id>
+-- 
+2.7.4
+
