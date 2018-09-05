@@ -1,14 +1,14 @@
-From 22e59575961bf8ee1fafaa196876b65ee15fb93a Mon Sep 17 00:00:00 2001
+From 25761b39d2e9f5d75a4dff64e84b13e5ad4c3d94 Mon Sep 17 00:00:00 2001
 From: FakeNeth <cneth97@gmail.com>
 Date: Tue, 7 Aug 2018 14:16:17 -0400
 Subject: [PATCH] brand server mod name
 
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 0399a48..1724725 100644
+index e0546e3..02a3fad 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1155,7 +1155,7 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IAs
+@@ -1156,7 +1156,7 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IAs
      }
  
      public String getServerModName() {

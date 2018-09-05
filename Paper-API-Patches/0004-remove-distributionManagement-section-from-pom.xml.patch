@@ -1,0 +1,33 @@
+From 8d63d64827a176debb27442f8bda48cc908a2764 Mon Sep 17 00:00:00 2001
+From: FakeNeth <cneth97@gmail.com>
+Date: Wed, 5 Sep 2018 06:56:37 -0400
+Subject: [PATCH] remove distributionManagement section from pom.xml
+
+
+diff --git a/pom.xml b/pom.xml
+index b3c6540..145ac50 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -24,19 +24,6 @@
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     </properties>
+ 
+-    <distributionManagement>
+-        <repository>
+-            <id>prodity-releases</id>
+-            <name>Prodity Releases</name>
+-            <url>https://nexus.prodity.io/repository/maven-releases/</url>
+-        </repository>
+-        <snapshotRepository>
+-            <id>prodity-snapshots</id>
+-            <name>Prodity Snapshots</name>
+-            <url>https://nexus.prodity.io/repository/maven-snapshots/</url>
+-        </snapshotRepository>
+-    </distributionManagement>
+-
+     <repositories>
+         <repository>
+             <id>spigotmc-public</id>
+-- 
+2.7.4
+
